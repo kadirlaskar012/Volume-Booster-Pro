@@ -133,18 +133,12 @@ function syncUI() {
       volumeDisplay.textContent = 'MUTED';
       if (gainSubtext) gainSubtext.textContent = `${actualPct}% (sound muted)`;
       volumeDisplay.className = 'volume-number tier-muted';
-      if (volumeHint) {
-        volumeHint.textContent = 'Click mute button to unmute';
-        volumeHint.classList.remove('hidden');
-      }
+      if (volumeHint) volumeHint.classList.add('hidden');
     } else if (effectivePct === 0) {
       volumeDisplay.textContent = '0%';
       if (gainSubtext) gainSubtext.textContent = '0.00× (Silenced)';
       volumeDisplay.className = 'volume-number tier-idle';
-      if (volumeHint) {
-        volumeHint.textContent = 'Drag slider to amplify audio';
-        volumeHint.classList.remove('hidden');
-      }
+      if (volumeHint) volumeHint.classList.add('hidden');
     } else {
       volumeDisplay.textContent = `${effectivePct}%`;
       if (gainSubtext) {

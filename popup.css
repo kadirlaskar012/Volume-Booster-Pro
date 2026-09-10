@@ -264,7 +264,7 @@ body {
 
 /* ── Main Volume Card (Strict Fixed Height) ──────────────────────────────── */
 .volume-card {
-  height: 154px;
+  height: 168px;
   background: var(--card-bg-gradient);
   border: 1px solid var(--border);
   border-radius: 12px;
