@@ -62,8 +62,8 @@
   user-select: none;
 }
 
-/* ── Strictly Locked Window Dimensions (Never Auto-Resizes) ─────────────── */
-html, body {
+/* ── Strictly Locked Window Dimensions for Extension Popup ──────────────── */
+html.popup-window, body.popup-window {
   width: 320px;
   height: 420px;
   min-width: 320px;
@@ -71,6 +71,12 @@ html, body {
   min-height: 420px;
   max-height: 420px;
   overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -83,12 +89,18 @@ html, body {
 .app-wrapper {
   width: 320px;
   height: 420px;
+  min-width: 320px;
+  max-width: 320px;
+  min-height: 420px;
+  max-height: 420px;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 6px 10px 8px 10px;
+  box-sizing: border-box;
+  background: var(--bg-dark);
 }
 
 /* ── Utilities ───────────────────────────────────────────────────────────── */

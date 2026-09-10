@@ -1,0 +1,239 @@
+================================================================================
+          CHROME WEB STORE PUBLISHING DETAILS — VOLUME BOOSTER PRO
+================================================================================
+Project: Volume Booster Pro (Ultra Audio Engine v2.0)
+Manifest Version: MV3 (Manifest V3 - 100% Compliant)
+Date Prepared: September 2026
+
+--------------------------------------------------------------------------------
+1. STORE LISTING — BASIC INFORMATION
+--------------------------------------------------------------------------------
+
+ITEM TITLE (Max 45 characters):
+Volume Booster Pro — Sound Booster & Bass EQ
+
+SHORT TITLE (Optional, for compact UI):
+Volume Booster Pro
+
+SUMMARY / SHORT DESCRIPTION (Strict limit: 132 characters):
+Boost volume up to 600%, enhance sub-bass, and customize sound with 4 DSP equalizer profiles. Works on YouTube, Netflix & Spotify.
+[Length: 131 characters — APPROVED for Chrome Web Store]
+
+PRIMARY CATEGORY:
+Accessibility  (Alternative: Productivity or Entertainment)
+
+VISIBILITY:
+Public
+
+PRICING:
+Free
+
+
+--------------------------------------------------------------------------------
+2. STORE LISTING — DETAILED DESCRIPTION (COPY & PASTE READY)
+--------------------------------------------------------------------------------
+
+Are quiet videos on YouTube, Netflix, or Spotify ruining your listening experience?
+
+Volume Booster Pro is a lightweight, ultra-powerful Chrome extension that lets you amplify browser audio up to 600% (6× baseline volume) with crystal-clear fidelity. Powered by the native Web Audio API, Volume Booster Pro transforms your laptop speakers or headphones into a high-grade audio powerhouse.
+
+From quiet speech in Zoom meetings and podcasts to thumping EDM tracks and immersive movies, Volume Booster Pro gives you complete mastery over your sound.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ KEY FEATURES & HIGHLIGHTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔊 UP TO 600% AUDIO AMPLIFICATION
+• Amplify any media tab beyond the standard 100% volume ceiling.
+• Clean, transparent gain staging powered by Web Audio API GainNode.
+• Instant 1-click presets: 100% (1×), 150% (1.5×), 200% (2×), 300% (3×), 400% (4×), and 600% (6×).
+
+🛡️ INTELLIGENT SOFT-KNEE SAFETY LIMITER
+• Built-in dynamic compression prevents speaker distortion and clipping.
+• Protects your ears and device hardware even at extreme boost levels.
+
+🎵 4 TAILORED DSP SOUND PROFILES (EQ)
+• 🎧 Balanced: Studio-grade neutral acoustic tuning for everyday listening.
+• 🔊 Bass Boost: Punchy low-end punch engineered for EDM, Hip-Hop, and trap beats.
+• 🗣️ Vocal Clear: Enhanced dialogue presence for podcasts, audiobooks, lectures, and calls.
+• 🎬 Cinema 3D: Wide spatial soundstage bringing movies, series, and games to life.
+
+⚡ DEDICATED SUB-BASS BOOSTER (+0 TO +15 dB)
+• Dedicated Low-Shelf DSP filter tuned at 80Hz.
+• Feel the deep sub-bass rumble on laptop speakers, monitors, and headphones.
+• Smooth granular slider for pinpoint low-frequency control.
+
+🌓 DYNAMIC LIGHT & DARK THEME ENGINE
+• 🌙 Sleek Midnight Dark Mode for low-light environments and OLED screens.
+• ☀️ Crisp, high-contrast Light Mode for bright daytime productivity.
+• 1-Click instant toggle with persistent memory across browser restarts.
+
+🎚️ PRO AUDIO FX & STEREO PANNER
+• L / R Stereo Balance slider to fix unbalanced recordings or accommodate hearing preferences.
+• 1-Click Center reset button.
+
+⌨️ GLOBAL KEYBOARD SHORTCUTS
+• Press Ctrl + Shift + Up Arrow (Command + Shift + Up on Mac) to boost volume.
+• Press Ctrl + Shift + Down Arrow (Command + Shift + Down on Mac) to lower volume.
+• Control sound instantly without ever clicking or opening the popup.
+
+🔒 100% PRIVACY & CLIENT-SIDE SECURITY
+• All audio processing runs 100% locally in your browser memory.
+• ZERO telemetry, ZERO analytics, ZERO external server calls, ZERO tracking.
+• No login or account required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 HOW TO USE IN 3 EASY STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Open any website playing audio or video (YouTube, Netflix, Spotify, Prime Video, etc.).
+2. Click the Volume Booster Pro icon in your Chrome toolbar.
+3. Drag the volume slider or select a quick preset (1.5×, 2×, 3×, 6×) to amplify your sound!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 COMPATIBILITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Volume Booster Pro works across all major web platforms:
+• Video: YouTube, Netflix, Disney+, Prime Video, Twitch, Vimeo, Dailymotion
+• Music & Podcasts: Spotify, SoundCloud, Apple Music, Deezer, Tidal, TuneIn
+• Meetings & Calls: Google Meet, Zoom Web, Microsoft Teams, Discord Web
+• Social Media: TikTok, Instagram, Twitter/X, Facebook, Reddit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ HEARING HEALTH & SAFETY ADVICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Volume Booster Pro is exceptionally powerful. Prolonged exposure to extreme volume levels (400%+) can cause hearing fatigue or speaker damage. We recommend starting at 150%–200% and adjusting upward as needed. Enjoy your sound responsibly!
+
+
+--------------------------------------------------------------------------------
+3. SEARCH KEYWORDS & SEO TAGS
+--------------------------------------------------------------------------------
+
+Primary Keywords:
+volume booster, sound booster, audio booster, volume master, 600% volume, bass boost, bass booster, sound amplifier, audio amplifier, youtube volume booster, equalizer, sound profile, volume control, sound enhancer, tab volume booster, loud volume, audio equalizer, sound leveler, volume slider, chrome audio booster
+
+
+--------------------------------------------------------------------------------
+4. PRIVACY PRACTICES TAB (MANDATORY FOR CHROME STORE REVIEW APPROVAL)
+--------------------------------------------------------------------------------
+
+SINGLE PURPOSE DESCRIPTION:
+"Volume Booster Pro amplifies tab audio up to 600% and provides equalizer sound profiles and sub-bass enhancement using the browser's native Web Audio API."
+
+PERMISSIONS JUSTIFICATION (Copy & paste into Chrome Developer Dashboard):
+
+1. tabCapture:
+"Used exclusively to capture the audio output stream of the currently active media tab, route it through an AudioContext GainNode and DSP filters for amplification and equalization, and stream it to the user's speakers. No audio is ever recorded, saved, or transmitted to any external server."
+
+2. storage:
+"Used strictly to save user preferences locally, including active volume gain level, selected sound profile (EQ), sub-bass boost dB, and light/dark theme preference across browser sessions."
+
+3. activeTab:
+"Used to inspect the active tab's domain URL to display current media playback status in the extension popup and enable keyboard shortcut volume control on the active tab."
+
+4. scripting:
+"Used to inject lightweight helper scripts to coordinate media stream routing and handle playback state changes seamlessly."
+
+DATA USAGE & PRIVACY DECLARATION:
+• Do you collect any personal data? NO
+• Do you sell or transfer user data? NO
+• Do you use user data for purposes unrelated to the extension's core functionality? NO
+• Do you use user data for lending or creditworthiness? NO
+
+OFFICIAL PRIVACY POLICY STATEMENT (URL or text):
+"Volume Booster Pro does not collect, transmit, store, or sell any personal data, user analytics, audio recordings, or browsing history. All digital signal processing (DSP) and Web Audio API amplification occur strictly in local client memory on the user's machine. User preferences (gain level, EQ preset, theme) are stored exclusively in Chrome's local storage sandbox (chrome.storage.local) and never leave the device."
+
+
+--------------------------------------------------------------------------------
+5. GRAPHIC ASSETS CHECKLIST
+--------------------------------------------------------------------------------
+
+[✔] Extension Icons (Located in `icons/` folder):
+    - icon16.png   (16 x 16 px)  — Toolbar favicon display
+    - icon32.png   (32 x 32 px)  — Windows high-DPI display
+    - icon48.png   (48 x 48 px)  — Chrome extensions management page
+    - icon128.png  (128 x 128 px) — Chrome Web Store store icon
+
+[✔] Store Promotional Screenshots (Located in `screenshots/` folder):
+    Resolution: 1280 x 800 px (16:10 aspect ratio, PNG format)
+    1. screenshot-1-volume-boost.png      — 600% Max Overdrive & Audio Spectrum
+    2. screenshot-2-equalizer-profiles.png — 4 Tailored DSP Sound Profiles (EQ)
+    3. screenshot-3-sub-bass-booster.png   — Dedicated +15 dB Sub-Bass Booster
+    4. screenshot-4-light-dark-mode.png    — Sleek Dark & Crisp Light Mode Theming
+    5. screenshot-5-stereo-settings.png    — Stereo Balance & Global Hotkeys
+
+Optional Promotional Tiles (Create if featured placement is desired):
+    - Small Promo Tile: 440 x 280 px PNG
+    - Large Promo Tile: 920 x 680 px PNG
+    - Marquee Promo Tile: 1400 x 560 px PNG
+
+
+--------------------------------------------------------------------------------
+6. STEP-BY-STEP PUBLISHING GUIDE (HOW TO SUBMIT TO CHROME STORE)
+--------------------------------------------------------------------------------
+
+STEP 1: PREPARE THE ZIP PACKAGE
+Create a clean ZIP archive of the extension containing ONLY the production files:
+Files to include:
+  • manifest.json
+  • background.js
+  • content.js
+  • popup.html
+  • popup.css
+  • popup.js
+  • icons/ (icon16.png, icon32.png, icon48.png, icon128.png)
+Files to exclude:
+  • .git/
+  • .gitignore
+  • screenshots/
+  • preview.html
+  • promo_shot.html
+  • generate_icons.py
+  • STORE_LISTING_DETAILS.txt
+
+(You can run the provided PowerShell command to automatically build `Volume-Booster-Pro.zip`!)
+
+STEP 2: OPEN CHROME DEVELOPER DASHBOARD
+1. Visit: https://chrome.google.com/webstore/devconsole/
+2. Sign in with your Google Account.
+3. If this is your first time, pay the one-time $5 Google Developer Registration fee.
+
+STEP 3: UPLOAD YOUR PACKAGE
+1. Click the blue "+ New Item" button.
+2. Select or drag-and-drop `Volume-Booster-Pro.zip`.
+3. The dashboard will validate your `manifest.json` and create your draft store listing.
+
+STEP 4: COMPLETE STORE LISTING TAB
+1. Title: Paste the Title from Section 1.
+2. Summary: Paste the 131-character Summary from Section 1.
+3. Detailed Description: Paste the complete Description from Section 2.
+4. Category: Select "Accessibility" or "Productivity".
+5. Language: Select "English".
+6. Store Icon: Upload `icons/icon128.png`.
+7. Screenshots: Upload all 5 screenshots from the `screenshots/` directory:
+   - `screenshot-1-volume-boost.png`
+   - `screenshot-2-equalizer-profiles.png`
+   - `screenshot-3-sub-bass-booster.png`
+   - `screenshot-4-light-dark-mode.png`
+   - `screenshot-5-stereo-settings.png`
+
+STEP 5: COMPLETE PRIVACY TAB
+1. Single Purpose: Paste the text from Section 4.
+2. Permission Justifications: Copy and paste the exact justifications for `tabCapture`, `storage`, `activeTab`, and `scripting` from Section 4.
+3. Data Usage: Check the boxes confirming you do not collect or sell user data.
+4. Privacy Policy URL: Paste a link to your hosted privacy policy (or your GitHub README privacy section).
+
+STEP 6: COMPLETE DISTRIBUTION TAB
+1. Visibility: Choose "Public".
+2. Countries: Select "All regions" (or your preferred regions).
+
+STEP 7: SUBMIT FOR REVIEW
+1. Click "Submit for Review".
+2. Google typically reviews and approves Manifest V3 extensions within 24 to 48 hours.
+3. Once approved, your extension will be live for millions of users on the Chrome Web Store!
+
+================================================================================
+                            END OF PUBLISH DETAILS
+================================================================================

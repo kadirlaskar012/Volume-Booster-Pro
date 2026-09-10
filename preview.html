@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Volume Booster Pro — Live Interactive Preview</title>
+  <title>Volume Booster Pro — Live Interactive Testbench & Preview</title>
 
-  <!-- Tailwind CSS via CDN with refined color system -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
             accent:  '#6C63FF',
-            accent2: '#38BDF8', // Secondary accent: Cyan/Teal
-            warning: '#F59E0B', // Amber warning accent
+            accent2: '#38BDF8',
+            warning: '#F59E0B',
             dark:    '#0B0B14',
             panel:   '#151528',
             card:    '#1C1C36',
             border:  '#2E2E52',
-            muted:   '#94A3B8', // Accessible slate-400
+            muted:   '#94A3B8',
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -32,428 +33,497 @@
   <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="popup.css" />
 
   <style>
-    body {
-      background: radial-gradient(circle at 50% 0%, #171536 0%, #08080f 85%);
-      min-height: 100vh;
-      color: #F8FAFC;
+    /* Full Responsive Viewport Base (Never clipped by popup.css) */
+    html, body {
+      width: 100% !important;
+      min-height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #171536 0%, #08080f 85%) !important;
+      color: #F8FAFC !important;
+    }
+
+    /* Light Mode Overrides for Preview Testbench */
+    html[data-theme="light"] body {
+      background: radial-gradient(circle at 50% 0%, #EEF2FF 0%, #F8FAFC 85%) !important;
+      color: #0F172A !important;
+    }
+    html[data-theme="light"] .preview-panel {
+      background: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+    html[data-theme="light"] .preview-panel-sub {
+      background: #F8FAFC !important;
+      border-color: #E2E8F0 !important;
+    }
+    html[data-theme="light"] .text-preview-white {
+      color: #0F172A !important;
+    }
+    html[data-theme="light"] .text-preview-muted {
+      color: #64748B !important;
+    }
+    html[data-theme="light"] .chrome-mockup {
+      background: #FFFFFF !important;
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+    }
+    html[data-theme="light"] .chrome-tab-bar {
+      background: #F1F5F9 !important;
+      border-color: #E2E8F0 !important;
+    }
+    html[data-theme="light"] .chrome-url-box {
+      background: #FFFFFF !important;
+      border-color: #CBD5E1 !important;
+      color: #334155 !important;
+    }
+
+    /* Glow and Mockup Shadows */
     .glow-canvas {
       box-shadow: 0 0 35px rgba(108, 99, 255, 0.18), 0 0 15px rgba(56, 189, 248, 0.12);
     }
     .chrome-mockup {
       box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      width: 322px;
+      max-width: 100%;
     }
   </style>
 </head>
 
-<body class="p-4 md:p-8 font-sans flex flex-col items-center justify-start min-h-screen">
+<body class="font-sans min-h-screen flex flex-col justify-between">
 
-  <!-- Header -->
-  <div class="max-w-4xl w-full text-center mb-7">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/40 text-indigo-300 text-xs font-semibold mb-3">
-      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-      LIVE TESTBENCH & EXTENSION PREVIEW
-    </div>
-    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyan-300">
-      Volume Booster Pro 🔊
-    </h1>
-    <p class="text-slate-400 text-sm md:text-base mt-2 max-w-xl mx-auto">
-      Test the Web Audio API amplification engine live up to 600%. Adjust the slider, play test audio, and watch the real-time audio visualizer react.
-    </p>
-  </div>
+  <!-- Main Container -->
+  <main class="w-full max-w-6xl mx-auto px-3 sm:px-6 py-6 md:py-10">
 
-  <!-- Main Grid: Extension UI + Real-time Audio Stage -->
-  <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-    <!-- Left Column: The Exact Extension Popup (340px) inside Chrome Browser Frame -->
-    <div class="lg:col-span-5 flex flex-col items-center">
-      <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-        <span>Extension Popup UI (Actual Size)</span>
+    <!-- Header Section -->
+    <header class="text-center mb-6 md:mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-3">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+        <span>LIVE TESTBENCH & REAL-TIME PREVIEW</span>
       </div>
 
-      <!-- Browser Window Mockup Frame -->
-      <div class="w-[360px] chrome-mockup rounded-2xl bg-[#121222] border border-border overflow-hidden">
-        <!-- Chrome Tab / Toolbar Bar -->
-        <div class="bg-[#0f0f1c] px-4 py-2.5 border-b border-border flex items-center justify-between">
-          <div class="flex items-center gap-1.5">
-            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-          </div>
-          <div class="flex items-center gap-2 bg-[#1b1b30] px-3 py-1 rounded-md text-[11px] text-slate-400 max-w-[180px] truncate border border-border/50">
-            <svg class="w-3 h-3 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            <span>youtube.com/watch?v=lofi</span>
-          </div>
-          <div class="flex items-center gap-2">
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-sky-200 to-cyan-300">
+        Volume Booster Pro 🔊
+      </h1>
+
+      <p class="text-slate-400 text-xs sm:text-sm md:text-base mt-2 max-w-xl mx-auto leading-relaxed text-preview-muted">
+        Experience up to 600% Web Audio API amplification live. Test sound presets, adjust Sub-Bass, toggle themes, and watch both audio spectrum visualizers react.
+      </p>
+    </header>
+
+    <!-- Interactive Grid (Responsive 1-Col on Mobile, 2-Col on Desktop) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start justify-center">
+
+      <!-- LEFT COLUMN: Exact 320x420 Extension Popup inside Chrome Window Mockup -->
+      <section class="lg:col-span-5 flex flex-col items-center w-full">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5 text-preview-muted">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+          <span>Extension Popup UI (Exact 320 × 420px)</span>
+        </div>
+
+        <!-- Chrome Browser Frame Mockup -->
+        <div class="chrome-mockup rounded-2xl bg-[#121222] border border-border overflow-hidden">
+          
+          <!-- Chrome Tab / Toolbar Bar -->
+          <div class="chrome-tab-bar bg-[#0f0f1c] px-3.5 py-2 border-b border-border flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+            </div>
+            
+            <div class="chrome-url-box flex items-center gap-1.5 bg-[#1b1b30] px-2.5 py-1 rounded-md text-[10.5px] text-slate-400 max-w-[170px] truncate border border-border/40">
+              <svg class="w-3 h-3 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              <span class="truncate">youtube.com/watch?v=lofi</span>
+            </div>
+
             <!-- Active Extension Icon with Badge -->
             <div class="relative cursor-pointer" title="Volume Booster Pro Extension">
-              <img src="icons/icon32.png" class="w-5 h-5 rounded-md" alt="icon" />
-              <span id="demo-badge" class="absolute -top-1.5 -right-2 text-[9px] bg-accent text-white font-bold px-1 rounded-full scale-90">1×</span>
+              <img src="icons/icon32.png" class="w-4 h-4 rounded" alt="icon" />
+              <span id="demo-badge" class="absolute -top-1.5 -right-2 text-[8px] bg-accent text-white font-bold px-1 rounded-full scale-90">1×</span>
             </div>
           </div>
-        </div>
 
-        <!-- The Actual Popup Container (Relative for Drawer Overlay) -->
-        <div class="w-full bg-dark text-slate-100 font-sans overflow-hidden relative">
+          <!-- THE EXACT EXTENSION POPUP DOM (.app-wrapper from popup.html) -->
+          <div class="app-wrapper">
 
-          <!-- Top Bar (Branded Gradient Speaker & Strong Hierarchy) -->
-          <div class="flex items-center justify-between px-5 pt-4 pb-2">
-            <div class="flex items-center gap-2.5">
-              <svg id="logo-icon" class="brand-speaker-glow shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <defs>
-                  <linearGradient id="vbp-grad-prev" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#38BDF8"/>
-                    <stop offset="100%" stop-color="#8B5CF6"/>
-                  </linearGradient>
-                </defs>
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="url(#vbp-grad-prev)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="url(#vbp-grad-prev)" stroke-width="2.2" stroke-linecap="round"/>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="url(#vbp-grad-prev)" stroke-width="2.2" stroke-linecap="round"/>
-              </svg>
-              <span class="text-sm font-bold tracking-wide text-white">Volume Booster Pro</span>
-            </div>
-
-            <div class="top-actions flex items-center gap-1.5">
-              <!-- Theme Toggle Button -->
-              <button id="btn-theme" title="Toggle Light/Dark Theme" class="btn-icon btn-theme" aria-label="Toggle Theme">
-                <svg id="theme-icon-sun" class="theme-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="5"/>
-                  <line x1="12" y1="1" x2="12" y2="3"/>
-                  <line x1="12" y1="21" x2="12" y2="23"/>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                  <line x1="1" y1="12" x2="3" y2="12"/>
-                  <line x1="21" y1="12" x2="23" y2="12"/>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            <!-- ── Top Bar ── -->
+            <div class="top-bar">
+              <div class="brand-wrapper">
+                <svg id="logo-icon" class="brand-speaker-glow" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <defs>
+                    <linearGradient id="vbp-grad-ultra" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38BDF8"/>
+                      <stop offset="60%" stop-color="#8B5CF6"/>
+                      <stop offset="100%" stop-color="#EC4899"/>
+                    </linearGradient>
+                  </defs>
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
                 </svg>
-                <svg id="theme-icon-moon" class="theme-icon hidden" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-              </button>
-
-              <button id="btn-settings" title="Settings (Pro)" class="btn-icon" aria-label="Settings">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Domain Info Bar (Hierarchy: Subordinate 11px font) -->
-          <div id="domain-bar" class="mx-4 mb-3 px-3 py-1.5 bg-panel rounded-lg border border-border flex items-center gap-2">
-            <div class="w-3.5 h-3.5 rounded-sm bg-red-600 flex items-center justify-center text-[9px] font-bold">▶</div>
-            <span id="domain-text" class="text-[11px] font-normal text-slate-400 truncate flex-1">youtube.com</span>
-            <span id="capture-status" class="text-[10px] px-2 py-0.5 rounded-full font-semibold status-active">● Enabled</span>
-          </div>
-
-          <!-- Error Banner (Hidden by default) -->
-          <div id="error-banner" class="hidden mx-4 mb-3 px-3 py-2 bg-red-950/40 border border-red-700/60 rounded-lg">
-            <p id="error-text" class="text-xs text-red-300 leading-relaxed"></p>
-          </div>
-
-          <!-- Main Volume Card -->
-          <div class="mx-4 bg-panel border border-border rounded-2xl overflow-hidden shadow-xl shadow-black/40">
-            <!-- Volume Display -->
-            <div class="px-5 pt-5 pb-3 text-center relative">
-              <div id="glow-orb" class="absolute inset-x-0 top-0 h-28 pointer-events-none" style="background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,0.22) 0%, transparent 70%);"></div>
-
-              <!-- 4-Tier Dynamic Status Dot & Label -->
-              <div class="flex justify-center items-center gap-2 mb-1">
-                <div id="boost-indicator" class="w-2 h-2 rounded-full transition-all duration-300 status-boosting"></div>
-                <span id="boost-label" class="text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 status-boosting">BOOSTING</span>
+                <span class="brand-title">Volume Booster</span>
+                <span class="pro-chip">PRO</span>
               </div>
 
-              <div id="volume-display" class="text-5xl font-extrabold tracking-tight leading-none mb-1 transition-all duration-150 tier-normal" style="font-variant-numeric: tabular-nums;">
-                100%
-              </div>
+              <!-- Top Right Actions: Theme Toggle & Settings Gear -->
+              <div class="top-actions">
+                <button id="btn-theme" title="Toggle Light/Dark Theme" class="btn-icon btn-theme" aria-label="Toggle Theme">
+                  <svg id="theme-icon-sun" class="theme-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                  </svg>
+                  <svg id="theme-icon-moon" class="theme-icon hidden" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  </svg>
+                </button>
 
-              <div id="gain-subtext" class="text-xs text-slate-400 font-medium">1.00× (Baseline)</div>
-              <div id="volume-hint" class="text-[11px] text-cyan-400/80 font-medium mt-0.5 hidden">Drag slider to amplify audio</div>
-            </div>
-
-            <div class="border-t border-border/70 mx-4"></div>
-
-            <!-- Slider Area (High-contrast 8px track) -->
-            <div class="px-5 py-4">
-              <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-2 px-0.5">
-                <span>0%</span>
-                <span>150%</span>
-                <span>300%</span>
-                <span>450%</span>
-                <span>600%</span>
-              </div>
-
-              <input
-                type="range"
-                id="volume-slider"
-                min="0"
-                max="600"
-                value="100"
-                step="1"
-                class="volume-slider w-full"
-                aria-label="Volume boost level"
-              />
-
-              <!-- Preset buttons with distinct active border & glow -->
-              <div class="flex gap-1.5 mt-3.5 justify-between">
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium active" data-value="100">1×</button>
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium" data-value="150">1.5×</button>
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium" data-value="200">2×</button>
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium" data-value="300">3×</button>
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium" data-value="400">4×</button>
-                <button class="preset-btn flex-1 text-[11px] py-1.5 rounded-lg font-medium" data-value="600">6×</button>
+                <button id="btn-settings" title="Audio FX Settings" class="btn-icon" aria-label="Settings">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  </svg>
+                </button>
               </div>
             </div>
-          </div>
 
-          <!-- Pro Audio DSP & Sound Profiles (Compact & Fitted) -->
-          <div class="section-card mt-2">
-            <div class="section-header">
-              <span class="section-title">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                Sound Profile (EQ)
-              </span>
-              <span id="active-profile-name" class="profile-pill">Balanced</span>
-            </div>
-            <div class="modes-grid">
-              <button class="mode-btn active" data-mode="balanced">
-                <span class="mode-icon">🎧</span>
-                <span class="mode-name">Balanced</span>
-              </button>
-              <button class="mode-btn" data-mode="bass">
-                <span class="mode-icon">🔊</span>
-                <span class="mode-name">Bass Boost</span>
-              </button>
-              <button class="mode-btn" data-mode="vocal">
-                <span class="mode-icon">🗣️</span>
-                <span class="mode-name">Vocal Clear</span>
-              </button>
-              <button class="mode-btn" data-mode="cinema">
-                <span class="mode-icon">🎬</span>
-                <span class="mode-name">Cinema 3D</span>
-              </button>
-            </div>
-
-            <!-- Sub-Bass Booster Row -->
-            <div class="bass-control-wrapper">
-              <div class="section-header bass-header">
-                <span class="section-title">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  Sub-Bass Booster
-                </span>
-                <span id="bass-db-text" class="bass-value-pill">+0 dB</span>
+            <!-- ── Domain Info Bar ── -->
+            <div id="domain-bar" class="domain-bar">
+              <div id="site-favicon" class="favicon-box">
+                <span style="font-size: 9px;">▶</span>
               </div>
-              <input
-                type="range"
-                id="bass-slider"
-                min="0"
-                max="15"
-                value="0"
-                step="1"
-                class="bass-slider"
-                aria-label="Bass boost intensity"
-              />
+              <span id="domain-text" class="domain-text">youtube.com</span>
+              <span id="capture-status" class="status-badge status-active">● Enabled</span>
             </div>
-          </div>
 
-          <!-- Action Buttons -->
-          <div class="flex gap-2 mx-4 mt-3 mb-3">
-            <button id="btn-boost" class="btn-boost state-active">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <line x1="15" y1="9" x2="15" y2="15"/>
-                <line x1="19" y1="7" x2="19" y2="17"/>
-                <line x1="23" y1="5" x2="23" y2="19"/>
-              </svg>
-              <span id="boost-btn-text">Boost Active</span>
-            </button>
-
-            <button id="btn-mute" title="Mute" class="btn-action">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <line x1="23" y1="9" x2="17" y2="15"/>
-                <line x1="17" y1="9" x2="23" y2="15"/>
-              </svg>
-            </button>
-
-            <button id="btn-reset" title="Reset to 100%" class="btn-action btn-reset-action">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="1 4 1 10 7 10"/>
-                <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Shortcut Hint -->
-          <div class="px-5 pb-3 flex items-center justify-center text-[11px] text-slate-400">
-            <div class="hotkey-tip">
-              <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
-              <span class="hotkey-label">to adjust boost</span>
+            <!-- Notice Banner (Hidden) -->
+            <div id="error-banner" class="notice-banner hidden">
+              <p id="error-text" class="notice-text"></p>
             </div>
-            <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
-          </div>
 
-          <!-- Pro Settings Panel (Collapsible Overlay Drawer) -->
-          <div id="settings-panel" class="hidden settings-drawer">
-            <div class="drawer-header">
-              <span class="drawer-title">Audio Settings & Balance</span>
-              <button id="btn-close-settings" class="btn-icon" title="Close" aria-label="Close Settings">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
+            <!-- ── Main Volume Card ── -->
+            <div class="volume-card">
+              <div class="card-top">
+                <div id="glow-orb" class="glow-orb"></div>
+
+                <!-- 4-Tier Status Indicator -->
+                <div class="status-row">
+                  <div id="boost-indicator" class="status-dot status-boosting"></div>
+                  <span id="boost-label" class="status-label status-boosting">BOOSTING</span>
+                </div>
+
+                <!-- Big Percentage Number -->
+                <div id="volume-display" class="volume-number tier-normal">
+                  100%
+                </div>
+
+                <!-- Gain Subtext -->
+                <div id="gain-subtext" class="gain-subtext">1.00× (Baseline)</div>
+                <div id="volume-hint" class="volume-hint hidden">Drag slider to amplify audio</div>
+
+                <!-- Live Mini Audio Visualizer Canvas -->
+                <div class="visualizer-wrapper">
+                  <canvas id="popup-visualizer"></canvas>
+                </div>
+              </div>
+
+              <div class="card-divider"></div>
+
+              <!-- Volume Slider & Preset Buttons -->
+              <div class="slider-area">
+                <div class="slider-labels">
+                  <span>0%</span>
+                  <span>150%</span>
+                  <span>300%</span>
+                  <span>450%</span>
+                  <span>600%</span>
+                </div>
+
+                <input
+                  type="range"
+                  id="volume-slider"
+                  min="0"
+                  max="600"
+                  value="100"
+                  step="1"
+                  class="volume-slider"
+                  aria-label="Volume boost level"
+                />
+
+                <div class="presets-row">
+                  <button class="preset-btn active" data-value="100">1×</button>
+                  <button class="preset-btn" data-value="150">1.5×</button>
+                  <button class="preset-btn" data-value="200">2×</button>
+                  <button class="preset-btn" data-value="300">3×</button>
+                  <button class="preset-btn" data-value="400">4×</button>
+                  <button class="preset-btn" data-value="600">6×</button>
+                </div>
+              </div>
             </div>
-            <div class="drawer-body">
+
+            <!-- ── Pro Audio DSP & Sound Profiles ── -->
+            <div class="section-card">
               <div class="section-header">
-                <span class="section-title">Stereo Balance (L / R)</span>
-                <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+                <span class="section-title">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  Sound Profile (EQ)
+                </span>
+                <span id="active-profile-name" class="profile-pill">Balanced</span>
               </div>
-              <div class="pan-control-row">
-                <span class="pan-label">L</span>
-                <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
-                <span class="pan-label">R</span>
+              <div class="modes-grid">
+                <button class="mode-btn active" data-mode="balanced">
+                  <span class="mode-icon">🎧</span>
+                  <span class="mode-name">Balanced</span>
+                </button>
+                <button class="mode-btn" data-mode="bass">
+                  <span class="mode-icon">🔊</span>
+                  <span class="mode-name">Bass Boost</span>
+                </button>
+                <button class="mode-btn" data-mode="vocal">
+                  <span class="mode-icon">🗣️</span>
+                  <span class="mode-name">Vocal Clear</span>
+                </button>
+                <button class="mode-btn" data-mode="cinema">
+                  <span class="mode-icon">🎬</span>
+                  <span class="mode-name">Cinema 3D</span>
+                </button>
               </div>
-              <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
+
+              <!-- Sub-Bass Booster Row -->
+              <div class="bass-control-wrapper">
+                <div class="section-header bass-header">
+                  <span class="section-title">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Sub-Bass Booster
+                  </span>
+                  <span id="bass-db-text" class="bass-value-pill">+0 dB</span>
+                </div>
+                <input
+                  type="range"
+                  id="bass-slider"
+                  min="0"
+                  max="15"
+                  value="0"
+                  step="1"
+                  class="bass-slider"
+                  aria-label="Bass boost intensity"
+                />
+              </div>
+            </div>
+
+            <!-- ── Action Buttons Row ── -->
+            <div class="actions-row">
+              <button id="btn-boost" class="btn-boost state-active">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <line x1="15" y1="9" x2="15" y2="15"/>
+                  <line x1="19" y1="7" x2="19" y2="17"/>
+                  <line x1="23" y1="5" x2="23" y2="19"/>
+                </svg>
+                <span id="boost-btn-text">Boost Active</span>
+              </button>
+
+              <button id="btn-mute" title="Mute/Unmute" class="btn-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <line x1="23" y1="9" x2="17" y2="15"/>
+                  <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+              </button>
+
+              <button id="btn-reset" title="Reset to 100%" class="btn-action btn-reset-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- ── Footer Bar ── -->
+            <div class="footer-bar">
+              <div class="hotkey-tip">
+                <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
+                <span class="hotkey-label">to adjust boost</span>
+              </div>
+              <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
+            </div>
+
+            <!-- ── Collapsible Advanced FX Drawer ── -->
+            <div id="settings-panel" class="settings-drawer hidden">
+              <div class="drawer-header">
+                <span class="drawer-title">Audio Settings & Balance</span>
+                <button id="btn-close-settings" class="btn-icon" title="Close" aria-label="Close Settings">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="drawer-body">
+                <div class="section-header">
+                  <span class="section-title">Stereo Balance (L / R)</span>
+                  <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+                </div>
+                <div class="pan-control-row">
+                  <span class="pan-label">L</span>
+                  <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
+                  <span class="pan-label">R</span>
+                </div>
+                <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Real-Time Audio Spectrum & Engine Telemetry -->
+      <section class="lg:col-span-7 space-y-5 w-full">
+
+        <!-- Live Web Audio Visualizer Card -->
+        <div class="preview-panel bg-panel border border-border rounded-2xl p-4 sm:p-5 glow-canvas relative overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 text-preview-white">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>Real-time Web Audio Spectrum</span>
+              </h2>
+              <p class="text-[11px] sm:text-xs text-slate-400 text-preview-muted">Live frequency buffer • 128-bin FFT with dynamic gain scaling</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] sm:text-[11px] text-cyan-300 bg-cyan-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border border-cyan-800/60 font-semibold font-mono">
+                FFT: 128 Bins
+              </span>
             </div>
           </div>
 
+          <!-- Canvas Visualizer (Dynamic Responsive Canvas) -->
+          <div class="w-full h-32 sm:h-36 bg-[#0c0c16] rounded-xl border border-border overflow-hidden relative flex items-center justify-center">
+            <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
+            <div id="canvas-overlay-text" class="absolute pointer-events-none text-[11px] sm:text-xs text-slate-200 font-medium bg-black/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg border border-border/70 shadow-lg text-center mx-2">
+              ▶ Press "Play Test Sound" below to test boost & audio visualizer
+            </div>
+          </div>
+
+          <!-- Audio Demo Controls -->
+          <div class="mt-3.5 flex flex-wrap items-center gap-2.5 sm:gap-3 justify-between">
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btn-play-demo" class="px-3.5 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-accent/20">
+                <svg id="play-icon" width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>
+                <span id="play-btn-label">Play Test Sound</span>
+              </button>
+
+              <select id="sound-type" class="bg-[#1b1b30] border border-border text-slate-200 text-xs rounded-xl px-2.5 py-2 outline-none cursor-pointer">
+                <option value="groove">Lofi Synth Melody</option>
+                <option value="chords">Ambient Pad Chords</option>
+                <option value="sine">Pure Test Tone (440Hz)</option>
+              </select>
+            </div>
+
+            <!-- Safety Limiter Badge -->
+            <div class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-1.5 text-preview-muted">
+              <span>Limiter:</span>
+              <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold text-[10.5px]">
+                Protected (Soft-Knee)
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Right Column: Real-time Audio Spectrum & Engine Telemetry -->
-    <div class="lg:col-span-7 space-y-5">
+        <!-- Live Audio Engine Telemetry Card -->
+        <div class="preview-panel bg-panel border border-border rounded-2xl p-4 sm:p-5 space-y-3.5">
+          <div class="flex items-center justify-between border-b border-border/70 pb-2.5">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 text-preview-white">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Audio Engine Telemetry</span>
+            </h3>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold">
+              Web Audio API
+            </span>
+          </div>
 
-      <!-- Live Web Audio Visualizer Card (Reduced height h-36 for tighter balance) -->
-      <div class="bg-panel border border-border rounded-2xl p-5 glow-canvas relative overflow-hidden">
-        <div class="flex items-center justify-between mb-3">
+          <div class="grid grid-cols-3 gap-2 sm:gap-2.5 text-center">
+            <div class="preview-panel-sub bg-dark/70 p-2 sm:p-2.5 rounded-xl border border-border/70">
+              <div class="text-[9.5px] sm:text-[10px] text-slate-400 font-medium text-preview-muted">Headroom</div>
+              <div id="stat-headroom" class="text-xs sm:text-sm font-bold text-cyan-400 mt-0.5">0.0 dB</div>
+            </div>
+            <div class="preview-panel-sub bg-dark/70 p-2 sm:p-2.5 rounded-xl border border-border/70">
+              <div class="text-[9.5px] sm:text-[10px] text-slate-400 font-medium text-preview-muted">Amplification</div>
+              <div id="stat-mult" class="text-xs sm:text-sm font-bold text-cyan-300 mt-0.5">1.00×</div>
+            </div>
+            <div class="preview-panel-sub bg-dark/70 p-2 sm:p-2.5 rounded-xl border border-border/70">
+              <div class="text-[9.5px] sm:text-[10px] text-slate-400 font-medium text-preview-muted">Pipeline Latency</div>
+              <div class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 text-preview-white">&lt; 3.5 ms</div>
+            </div>
+          </div>
+
+          <!-- Dynamic Peak Gain Bar -->
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              Real-time Web Audio Spectrum
-            </h2>
-            <p class="text-xs text-slate-400">Live frequency buffer • Natural baseline with dynamic gain scaling</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] text-cyan-300 bg-cyan-950/40 px-2.5 py-1 rounded-md border border-cyan-800/60 font-semibold font-mono">
-              FFT: 128 Bins
-            </span>
+            <div class="flex justify-between text-[10px] text-slate-400 mb-1 font-medium text-preview-muted">
+              <span>Output Gain Level</span>
+              <span id="meter-level-text" class="text-slate-300 font-mono text-preview-white">1.00× (100%)</span>
+            </div>
+            <div class="w-full h-2 bg-[#37375A] rounded-full overflow-hidden">
+              <div id="gain-meter-bar" class="h-full bg-cyan-400 transition-all duration-150" style="width: 16.6%;"></div>
+            </div>
           </div>
         </div>
 
-        <!-- Canvas Visualizer (h-36: compact & perfectly balanced) -->
-        <div class="w-full h-36 bg-[#0c0c16] rounded-xl border border-border overflow-hidden relative flex items-center justify-center">
-          <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
-          <div id="canvas-overlay-text" class="absolute pointer-events-none text-xs text-slate-200 font-medium bg-black/60 backdrop-blur-sm px-3.5 py-1.5 rounded-lg border border-border/70 shadow-lg">
-            ▶ Press "Play Test Sound" below to hear and see the boost
-          </div>
-        </div>
-
-        <!-- Audio Demo Controls (Safety Limiter in Cyan/Teal, not green) -->
-        <div class="mt-3.5 flex flex-wrap items-center gap-3 justify-between">
-          <div class="flex items-center gap-2">
-            <button id="btn-play-demo" class="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-accent/20">
-              <svg id="play-icon" width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>
-              <span id="play-btn-label">Play Test Sound</span>
-            </button>
-
-            <select id="sound-type" class="bg-[#1b1b30] border border-border text-slate-200 text-xs rounded-xl px-3 py-2 outline-none">
-              <option value="groove">Lofi Synth Melody</option>
-              <option value="chords">Ambient Pad Chords</option>
-              <option value="sine">Pure Test Tone (440Hz)</option>
-            </select>
-          </div>
-
-          <!-- Teal/Cyan Safety Limiter Badge (Contrasted from Green Enabled Badge) -->
-          <div class="text-xs text-slate-300 flex items-center gap-1.5">
-            <span>Limiter:</span>
-            <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold text-[11px]">
-              Protected (Soft-Knee)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Audio Engine Telemetry & Live Metrics Card (Fills empty space with rich info) -->
-      <div class="bg-panel border border-border rounded-2xl p-5 space-y-3.5">
-        <div class="flex items-center justify-between border-b border-border/70 pb-2.5">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            Audio Engine Telemetry
+        <!-- Quick Chrome Load Guide -->
+        <div class="preview-panel bg-panel/70 border border-border rounded-2xl p-4 sm:p-5">
+          <h3 class="text-xs sm:text-sm font-bold text-white mb-2.5 flex items-center gap-2 text-preview-white">
+            <span>🚀 Load Extension in Google Chrome (Developer Mode)</span>
           </h3>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold">
-            Web Audio API
-          </span>
+          <ol class="space-y-2 text-xs text-slate-300 leading-relaxed text-preview-muted">
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+              <span>Open <code class="text-cyan-400 bg-dark/60 px-1.5 py-0.5 rounded border border-border font-mono">chrome://extensions/</code> in your browser and enable <strong>Developer mode</strong>.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+              <span>Click <strong>Load unpacked</strong> and select the project directory: <code class="text-indigo-300 font-mono text-[11px] block mt-0.5">.../Volume Booster Pro</code></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+              <span>Click the extension icon on any YouTube, Netflix, or Spotify tab to boost sound up to 600%!</span>
+            </li>
+          </ol>
         </div>
 
-        <div class="grid grid-cols-3 gap-2.5 text-center">
-          <div class="bg-dark/70 p-2.5 rounded-xl border border-border/70">
-            <div class="text-[10px] text-slate-400 font-medium">Headroom</div>
-            <div id="stat-headroom" class="text-xs font-bold text-cyan-400 mt-0.5">0.0 dB</div>
-          </div>
-          <div class="bg-dark/70 p-2.5 rounded-xl border border-border/70">
-            <div class="text-[10px] text-slate-400 font-medium">Amplification</div>
-            <div id="stat-mult" class="text-xs font-bold text-cyan-300 mt-0.5">1.00×</div>
-          </div>
-          <div class="bg-dark/70 p-2.5 rounded-xl border border-border/70">
-            <div class="text-[10px] text-slate-400 font-medium">Pipeline Latency</div>
-            <div class="text-xs font-bold text-slate-200 mt-0.5">&lt; 3.5 ms</div>
-          </div>
-        </div>
-
-        <!-- Dynamic Peak Gain Bar -->
-        <div>
-          <div class="flex justify-between text-[10px] text-slate-400 mb-1 font-medium">
-            <span>Output Gain Meter</span>
-            <span id="meter-level-text" class="text-slate-300 font-mono">1.00× (100%)</span>
-          </div>
-          <div class="w-full h-2 bg-[#37375A] rounded-full overflow-hidden">
-            <div id="gain-meter-bar" class="h-full bg-cyan-400 transition-all duration-150" style="width: 16.6%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Chrome Load Guide -->
-      <div class="bg-panel/70 border border-border rounded-2xl p-5">
-        <h3 class="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
-          <span>🚀 Load in Google Chrome in 3 Steps</span>
-        </h3>
-        <ol class="space-y-2 text-xs text-slate-300 leading-relaxed">
-          <li class="flex items-start gap-2">
-            <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-            <span>Open <code class="text-cyan-300 bg-dark px-1.5 py-0.5 rounded border border-border">chrome://extensions/</code> and enable <strong>Developer mode</strong> (top-right toggle).</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-            <span>Click <strong>Load unpacked</strong> and select the project folder: <br/>
-            <code class="text-indigo-300 text-[11px] bg-dark px-2 py-1 rounded block mt-1 border border-border font-mono break-all">
-              [your-project-folder]/Volume Booster Pro
-            </code>
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-            <span>Click the extension icon on any YouTube, Netflix or Spotify tab → click <strong>Enable Boost</strong> to amplify audio up to 600%!</span>
-          </li>
-        </ol>
-      </div>
+      </section>
 
     </div>
-  </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-4 border-t border-border/40 text-[11px] text-slate-500">
+    Volume Booster Pro • Ultra Audio Engine v2.0 • 100% Client-Side Web Audio DSP
+  </footer>
 
   <!-- Live Audio Synth & Visualizer Controller Script -->
   <script>
     'use strict';
 
-    // ── Single Source of Truth: State Store ──────────────────────────────────
+    // ── Central State Store ──────────────────────────────────────────────────
     const state = {
       gain: 1.0,           // 0.0 to 6.0
       isMuted: false,      // boolean
-      isCapturing: true,   // extension is enabled on current tab
+      isCapturing: true,   // tab boost state
       domain: 'youtube.com',
       bass: 0,             // 0 to 15 dB
       eqMode: 'balanced',  // 'balanced' | 'bass' | 'vocal' | 'cinema'
@@ -473,6 +543,7 @@
     const display = document.getElementById('volume-display');
     const gainSubtext = document.getElementById('gain-subtext');
     const volumeHint = document.getElementById('volume-hint');
+    const glowOrb = document.getElementById('glow-orb');
     const badge = document.getElementById('demo-badge');
     const presetBtns = document.querySelectorAll('.preset-btn');
     const modeBtns = document.querySelectorAll('.mode-btn');
@@ -494,7 +565,8 @@
     const btnPlayDemo = document.getElementById('btn-play-demo');
     const playBtnLabel = document.getElementById('play-btn-label');
     const soundTypeSelect = document.getElementById('sound-type');
-    const canvas = document.getElementById('visualizer-canvas');
+    const canvasMain = document.getElementById('visualizer-canvas');
+    const canvasPopup = document.getElementById('popup-visualizer');
     const canvasOverlayText = document.getElementById('canvas-overlay-text');
     const boostIndicator = document.getElementById('boost-indicator');
     const boostLabel = document.getElementById('boost-label');
@@ -503,18 +575,18 @@
     const statMult = document.getElementById('stat-mult');
     const meterLevelText = document.getElementById('meter-level-text');
     const gainMeterBar = document.getElementById('gain-meter-bar');
-    const ctx = canvas.getContext('2d');
+    const ctxMain = canvasMain.getContext('2d');
+    const ctxPopup = canvasPopup ? canvasPopup.getContext('2d') : null;
 
     // ── Web Audio State ──
     let audioCtx = null;
     let masterGain = null;
-    let rawSignalBus = null; // Bus providing natural unboosted signal to the analyser
+    let rawSignalBus = null;
     let analyser = null;
     let isPlaying = false;
     let sequencerTimer = null;
     let noteIndex = 0;
 
-    // Melody notes for demo (MIDI frequencies in Hz)
     const melody = [261.63, 329.63, 392.00, 523.25, 440.00, 392.00, 329.63, 293.66];
     const chords = [
       [261.63, 329.63, 392.00], // C
@@ -523,13 +595,13 @@
       [196.00, 246.94, 293.66]  // G
     ];
 
-    // ── Unified UI Synchronization (Single Source of Truth) ──
+    // ── Synchronize All UI Components ──
     function syncUI() {
       const effectiveGain = state.isMuted ? 0 : state.gain;
       const actualPct = Math.round(state.gain * 100);
       const effectivePct = Math.round(effectiveGain * 100);
 
-      // 1. Slider & high-contrast gradient fill
+      // 1. Slider & dynamic background fill
       slider.value = actualPct;
       const fillPercentage = (actualPct / 600) * 100;
       let gradientStops = '#38BDF8';
@@ -538,13 +610,13 @@
       } else if (actualPct > 100) {
         gradientStops = '#6C63FF';
       }
-      slider.style.background = `linear-gradient(to right, ${gradientStops} ${fillPercentage}%, #37375A ${fillPercentage}%)`;
+      slider.style.background = `linear-gradient(to right, ${gradientStops} ${fillPercentage}%, var(--slider-track) ${fillPercentage}%)`;
 
-      // 2. Volume display text & empty-state hint
+      // 2. Volume display text & typography tiers
       if (state.isMuted) {
         display.textContent = 'MUTED';
         gainSubtext.textContent = `${actualPct}% (sound muted)`;
-        display.className = 'text-5xl font-extrabold tracking-tight leading-none mb-1 transition-all duration-150 tier-muted';
+        display.className = 'volume-number tier-muted';
         if (volumeHint) {
           volumeHint.textContent = 'Click mute button to unmute';
           volumeHint.classList.remove('hidden');
@@ -552,7 +624,7 @@
       } else if (effectivePct === 0) {
         display.textContent = '0%';
         gainSubtext.textContent = '0.00× (Silenced)';
-        display.className = 'text-5xl font-extrabold tracking-tight leading-none mb-1 transition-all duration-150 tier-idle';
+        display.className = 'volume-number tier-idle';
         if (volumeHint) {
           volumeHint.textContent = 'Drag slider to amplify audio';
           volumeHint.classList.remove('hidden');
@@ -572,18 +644,27 @@
         else if (effectivePct >= 400) tier = 'tier-warning';
         else if (effectivePct > 200)  tier = 'tier-high';
         else if (effectivePct > 100)  tier = 'tier-boosted';
-        display.className = `text-5xl font-extrabold tracking-tight leading-none mb-1 transition-all duration-150 ${tier}`;
+        display.className = `volume-number ${tier}`;
       }
 
-      // 3. 4-Tier Dynamic Status Dot & Label (Items 1 & 3)
-      // - 0% gain (or muted) → "IDLE" (gray dot: #64748B)
-      // - 1%–100% gain → "BOOSTING" (cyan/blue dot: #38BDF8)
-      // - 101%–399% gain → "BOOSTED" (purple/violet dot: #A855F7)
-      // - 400%+ gain → "HIGH BOOST ⚠️" (amber/orange dot: #F59E0B warning zone)
-      boostIndicator.className = 'w-2 h-2 rounded-full transition-all duration-300';
-      boostLabel.className = 'text-[11px] font-semibold uppercase tracking-widest transition-all duration-300';
+      // 3. Dynamic Glow Orb
+      if (glowOrb) {
+        if (state.isMuted || effectivePct === 0) {
+          glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(100, 116, 139, 0.12) 0%, transparent 70%)';
+        } else if (effectivePct >= 400) {
+          glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.3) 0%, transparent 70%)';
+        } else if (effectivePct > 100) {
+          glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 70%)';
+        } else {
+          glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 70%)';
+        }
+      }
 
-      if (effectivePct === 0) {
+      // 4. 4-Tier Dynamic Status Dot & Label
+      boostIndicator.className = 'status-dot';
+      boostLabel.className = 'status-label';
+
+      if (effectivePct === 0 || state.isMuted) {
         boostLabel.textContent = 'IDLE';
         boostLabel.classList.add('status-idle');
         boostIndicator.classList.add('status-idle');
@@ -601,7 +682,7 @@
         boostIndicator.classList.add('status-warning');
       }
 
-      // 4. Boost Button State & Label
+      // 5. Boost Button State & Label Sync
       btnBoost.classList.remove('state-active', 'state-inactive');
       if (state.isCapturing && effectiveGain > 0) {
         btnBoost.classList.add('state-active');
@@ -611,47 +692,47 @@
         btnBoostText.textContent = 'Enable Boost';
       }
 
-      // 5. Preset Button Highlights (Distinct active border & glow)
+      // 6. Preset Buttons
       presetBtns.forEach(btn => {
         const val = parseInt(btn.dataset.value, 10);
         btn.classList.toggle('active', val === actualPct && !state.isMuted);
       });
 
-      // 6. Mute Button Visual State
+      // 7. Mute Button
       btnMute.classList.toggle('muted', state.isMuted);
       btnMute.title = state.isMuted ? 'Unmute' : 'Mute';
 
-      // 7. Domain Row & Status Badge (Green Enabled Badge)
+      // 8. Capture Status Badge
       captureStatus.textContent = state.isCapturing ? '● Enabled' : '○ Inactive';
       captureStatus.classList.toggle('status-active', state.isCapturing);
       captureStatus.classList.toggle('status-inactive', !state.isCapturing);
 
-      // 8. Toolbar icon badge (Dynamic color matching boost tier)
+      // 9. Toolbar icon badge
       badge.textContent = effectivePct === 0 ? 'OFF' : `${(effectivePct / 100).toFixed(1).replace('.0', '')}×`;
       if (effectivePct === 0) {
         badge.style.backgroundColor = '#64748B';
       } else if (effectivePct > 400) {
-        badge.style.backgroundColor = '#EF4444'; // Red/Amber warning
+        badge.style.backgroundColor = '#EF4444';
       } else if (effectivePct > 150) {
-        badge.style.backgroundColor = '#2563EB'; // Blue
+        badge.style.backgroundColor = '#2563EB';
       } else {
-        badge.style.backgroundColor = '#8B5CF6'; // Purple (1–150%)
+        badge.style.backgroundColor = '#8B5CF6';
       }
 
-      // 9. Update Telemetry Card
+      // 10. Update Telemetry Card
       if (meterLevelText) meterLevelText.textContent = `${effectiveGain.toFixed(2)}× (${effectivePct}%)`;
       if (statMult) statMult.textContent = `${effectiveGain.toFixed(2)}×`;
       if (statHeadroom) {
         const db = effectiveGain > 0 ? (20 * Math.log10(effectiveGain)).toFixed(1) : '-∞';
         statHeadroom.textContent = effectiveGain >= 1.0 ? `+${db} dB` : `${db} dB`;
-        statHeadroom.className = effectiveGain >= 4.0 ? 'text-xs font-bold text-amber-400 mt-0.5' : 'text-xs font-bold text-cyan-400 mt-0.5';
+        statHeadroom.className = effectiveGain >= 4.0 ? 'text-xs sm:text-sm font-bold text-amber-400 mt-0.5' : 'text-xs sm:text-sm font-bold text-cyan-400 mt-0.5';
       }
       if (gainMeterBar) {
         gainMeterBar.style.width = `${Math.min(100, Math.max(0, fillPercentage))}%`;
         gainMeterBar.className = effectivePct >= 400 ? 'h-full bg-amber-400 transition-all duration-150' : (effectivePct > 100 ? 'h-full bg-indigo-400 transition-all duration-150' : 'h-full bg-cyan-400 transition-all duration-150');
       }
 
-      // 10. Sub-Bass & EQ Profiles Sync
+      // 11. Sub-Bass & EQ Profiles
       if (bassSlider) bassSlider.value = state.bass;
       if (bassDbText) bassDbText.textContent = `+${state.bass} dB`;
       if (panSlider) panSlider.value = state.pan;
@@ -664,7 +745,7 @@
         activeProfileName.style.color = currentPreset.color;
       }
 
-      // 11. Update Web Audio Master Gain
+      // 12. Update Web Audio Master Gain
       if (masterGain && audioCtx) {
         const now = audioCtx.currentTime;
         masterGain.gain.cancelScheduledValues(now);
@@ -678,78 +759,103 @@
       if (audioCtx) return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      // Analyser for real-time visualizer
       analyser = audioCtx.createAnalyser();
       analyser.fftSize = 128;
 
-      // Raw Signal Bus: receives natural unboosted signal for the visualizer
       rawSignalBus = audioCtx.createGain();
       rawSignalBus.gain.value = 1.0;
       rawSignalBus.connect(analyser);
 
-      // Master Gain for Volume Booster simulation (connected to speakers)
       masterGain = audioCtx.createGain();
       masterGain.gain.value = (state.isMuted ? 0 : state.gain) * 0.12;
       masterGain.connect(audioCtx.destination);
 
-      setupCanvas();
-      drawVisualizer();
+      setupCanvases();
+      drawVisualizers();
     }
 
-    function setupCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    function setupCanvases() {
+      if (canvasMain) {
+        const rect = canvasMain.getBoundingClientRect();
+        canvasMain.width = rect.width * window.devicePixelRatio;
+        canvasMain.height = rect.height * window.devicePixelRatio;
+        ctxMain.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+      if (canvasPopup && ctxPopup) {
+        const rect = canvasPopup.getBoundingClientRect();
+        canvasPopup.width = rect.width * window.devicePixelRatio;
+        canvasPopup.height = rect.height * window.devicePixelRatio;
+        ctxPopup.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
     }
 
-    window.addEventListener('resize', setupCanvas);
+    window.addEventListener('resize', setupCanvases);
 
-    // ── Visualizer Render Loop ──
-    function drawVisualizer() {
-      requestAnimationFrame(drawVisualizer);
+    // ── Dual Visualizer Render Loop ──
+    function drawVisualizers() {
+      requestAnimationFrame(drawVisualizers);
       if (!analyser) return;
 
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteFrequencyData(dataArray);
 
-      const width = canvas.width / window.devicePixelRatio;
-      const height = canvas.height / window.devicePixelRatio;
-
-      ctx.clearRect(0, 0, width, height);
-
-      const barWidth = (width / bufferLength) * 2.2;
-      let x = 0;
-
-      // Scale factor: at 0% gain, baseline is 0.42 (natural unboosted level).
-      // As gain boosts up to 600%, it scales smoothly up to 1.0 (full height surge).
       const effectiveGain = state.isMuted ? 0 : state.gain;
       const boostScale = 0.42 + 0.58 * (effectiveGain / 6.0);
 
-      for (let i = 0; i < bufferLength; i++) {
-        const naturalAmp = dataArray[i] / 255;
-        const barHeight = naturalAmp * height * 0.9 * boostScale;
-
-        // Dynamic color shifting: from Cyan/Teal through Violet to Amber warning
-        let barColor = 'hsla(195, 95%, 60%, 0.9)'; // Cyan
-        if (effectiveGain >= 4.0) {
-          barColor = 'hsla(38, 95%, 58%, 0.95)'; // Amber
-        } else if (effectiveGain > 1.0) {
-          barColor = 'hsla(265, 90%, 65%, 0.9)'; // Violet/Purple
-        }
-
-        ctx.fillStyle = barColor;
-        ctx.shadowBlur = effectiveGain > 1.5 ? 8 : 2;
-        ctx.shadowColor = barColor;
-
-        ctx.fillRect(x, height - barHeight, barWidth - 2, barHeight);
-        x += barWidth;
+      // Color scheme based on boost tier
+      let barColor = 'hsla(195, 95%, 60%, 0.9)';
+      if (effectiveGain >= 4.0) {
+        barColor = 'hsla(38, 95%, 58%, 0.95)';
+      } else if (effectiveGain > 1.0) {
+        barColor = 'hsla(265, 90%, 65%, 0.9)';
       }
-      ctx.shadowBlur = 0;
+
+      // 1. Render Main 128-bin Canvas
+      if (canvasMain && ctxMain) {
+        const width = canvasMain.width / window.devicePixelRatio;
+        const height = canvasMain.height / window.devicePixelRatio;
+        ctxMain.clearRect(0, 0, width, height);
+
+        const barWidth = (width / bufferLength) * 2.2;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const naturalAmp = dataArray[i] / 255;
+          const barHeight = naturalAmp * height * 0.9 * boostScale;
+
+          ctxMain.fillStyle = barColor;
+          ctxMain.shadowBlur = effectiveGain > 1.5 ? 8 : 2;
+          ctxMain.shadowColor = barColor;
+
+          ctxMain.fillRect(x, height - barHeight, barWidth - 2, barHeight);
+          x += barWidth;
+        }
+        ctxMain.shadowBlur = 0;
+      }
+
+      // 2. Render Popup Mini 16-bar Canvas
+      if (canvasPopup && ctxPopup) {
+        const width = canvasPopup.width / window.devicePixelRatio;
+        const height = canvasPopup.height / window.devicePixelRatio;
+        ctxPopup.clearRect(0, 0, width, height);
+
+        const miniBars = 16;
+        const barWidth = width / miniBars;
+        const step = Math.floor(bufferLength / miniBars);
+
+        for (let i = 0; i < miniBars; i++) {
+          const val = dataArray[i * step] || 0;
+          const amp = val / 255;
+          const barHeight = Math.max(2, amp * height * boostScale);
+
+          ctxPopup.fillStyle = barColor;
+          ctxPopup.fillRect(i * barWidth + 1, height - barHeight, barWidth - 2, barHeight);
+        }
+      }
     }
 
-    // ── Play Synthesized Audio ──
+    // ── Synthesized Demo Player ──
     function playTone() {
       if (!audioCtx || !isPlaying) return;
 
@@ -794,7 +900,6 @@
         });
         noteIndex++;
       } else {
-        // Pure 440Hz tone
         const osc = audioCtx.createOscillator();
         const env = audioCtx.createGain();
         osc.type = 'sine';
@@ -843,7 +948,7 @@
       }
     });
 
-    // ── Event Handlers Driving the Central State ──
+    // ── Event Handlers ──
     slider.addEventListener('input', (e) => {
       const val = parseInt(e.target.value, 10);
       state.gain = val / 100;
@@ -888,7 +993,7 @@
       syncUI();
     });
 
-    // Theme Toggling
+    // Theme Toggle Functionality
     function applyTheme(theme) {
       state.theme = theme;
       document.documentElement.setAttribute('data-theme', theme);
@@ -951,7 +1056,7 @@
       });
     }
 
-    // Initialize UI and Theme on load
+    // Initial Setup
     applyTheme('dark');
     syncUI();
   </script>

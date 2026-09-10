@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, height=800, initial-scale=1.0" />
+  <title>Volume Booster Pro — Store Screenshot Generator</title>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Strict 1280 x 800 Chrome Web Store Screenshot Canvas */
+    body {
+      width: 1280px;
+      height: 800px;
+      min-width: 1280px;
+      max-width: 1280px;
+      min-height: 800px;
+      max-height: 800px;
+      overflow: hidden;
+      background: #090915;
+      color: #F8FAFC;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Ambient Glowing Orbs */
+    .bg-glow-1 {
+      position: absolute;
+      top: -100px;
+      left: -80px;
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 99, 255, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+      filter: blur(45px);
+    }
+
+    .bg-glow-2 {
+      position: absolute;
+      bottom: -120px;
+      right: -60px;
+      width: 650px;
+      height: 650px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+      filter: blur(50px);
+    }
+
+    .grid-pattern {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Master Wrapper Centered inside 1280x800 */
+    .promo-wrapper {
+      width: 1140px;
+      height: 680px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    /* Left Promo Content Column */
+    .promo-content {
+      width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(108, 99, 255, 0.18);
+      border: 1px solid rgba(108, 99, 255, 0.4);
+      color: #A5B4FC;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .feature-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38BDF8;
+      box-shadow: 0 0 8px #38BDF8;
+    }
+
+    .promo-title {
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #FFFFFF 25%, #E0E7FF 65%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .promo-subtitle {
+      font-size: 16.5px;
+      line-height: 1.5;
+      color: #94A3B8;
+      font-weight: 400;
+    }
+
+    .bullets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 11px 15px;
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .bullet-icon {
+      font-size: 18px;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .bullet-text-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #F1F5F9;
+      margin-bottom: 2px;
+    }
+
+    .bullet-text-desc {
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+
+    /* Right Mockup Display Column */
+    .mockup-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chrome-frame {
+      width: 326px;
+      border-radius: 20px;
+      background: #111122;
+      border: 1px solid #2B2B50;
+      box-shadow: 
+        0 30px 80px -15px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 40px rgba(108, 99, 255, 0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chrome-toolbar {
+      background: #0D0D1A;
+      padding: 9px 14px;
+      border-bottom: 1px solid #262648;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 6px;
+    }
+    .traffic-light {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .tl-red { background: #EF4444; }
+    .tl-yellow { background: #F59E0B; }
+    .tl-green { background: #10B981; }
+
+    .address-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1A1A30;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 10.5px;
+      color: #94A3B8;
+      max-width: 170px;
+    }
+
+    .badge-icon-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .badge-pill {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      font-size: 8px;
+      font-weight: 800;
+      color: white;
+      padding: 1px 4px;
+      border-radius: 99px;
+    }
+
+    /* Highlight Callout Badges */
+    .callout-badge {
+      position: absolute;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid #38BDF8;
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.35);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      z-index: 25;
+      animation: floatBadge 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      from { transform: translateY(0px); }
+      to   { transform: translateY(-5px); }
+    }
+
+    /* Dual Mockup Arrangement for Theme Comparison (Shot 4) */
+    .dual-mockup-wrapper {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .dual-frame {
+      width: 275px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #2B2B50;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+    }
+    .dual-frame.light {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0,0,0,0.06);
+    }
+    .dual-frame .app-wrapper {
+      zoom: 0.85;
+    }
+
+    /* Settings Drawer Preview Styles */
+    .settings-drawer-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .settings-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .settings-val {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+  <div class="grid-pattern"></div>
+
+  <!-- Master Content Wrapper (Fixed within 1280x800) -->
+  <div class="promo-wrapper">
+
+    <!-- Left Content Column -->
+    <div class="promo-content">
+      <div id="feature-badge" class="feature-badge">
+        <span class="feature-badge-dot"></span>
+        <span id="badge-text">MAXIMUM SOUND AMPLIFICATION</span>
+      </div>
+
+      <h1 id="promo-title" class="promo-title">
+        Boost Volume<br/>Up To 600%
+      </h1>
+
+      <p id="promo-subtitle" class="promo-subtitle">
+        Overdrive quiet audio on YouTube, Netflix, Spotify, or any tab with pure Web Audio API amplification.
+      </p>
+
+      <div id="bullets-container" class="bullets-list">
+        <!-- Bullets populated dynamically by script -->
+      </div>
+    </div>
+
+    <!-- Right Mockup Column -->
+    <div id="mockup-container" class="mockup-stage">
+      <!-- Rendered dynamically -->
+    </div>
+
+  </div>
+
+  <script>
+    'use strict';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const shot = parseInt(urlParams.get('shot') || '1', 10);
+
+    const SHOTS_DATA = {
+      1: {
+        badge: 'MAXIMUM SOUND AMPLIFICATION',
+        title: 'Boost Volume<br/>Up To 600%',
+        subtitle: 'Amplify quiet videos, movies, podcasts, and music tabs up to 600% with pristine Web Audio clarity.',
+        bullets: [
+          { icon: '🚀', title: '6× Powerful Amplification', desc: 'Hear whispered dialogues and quiet recordings at loud, crystal-clear volume.' },
+          { icon: '🛡️', title: 'Soft-Knee Safety Limiter', desc: 'Built-in audio compression prevents harsh speaker distortion and clipping.' },
+          { icon: '⚡', title: '1-Click Quick Presets', desc: 'Instantly jump to 100%, 150%, 200%, 300%, 400%, or 600% boost with one click.' }
+        ],
+        callout: { text: '⚡ 600% Clean Overdrive', top: '155px', left: '-55px' },
+        popupConfig: {
+          gain: 6.0,
+          pct: '600%',
+          subtext: '6.00× gain (Maximum Overdrive)',
+          statusLabel: 'HIGH BOOST ⚠️',
+          statusClass: 'status-warning',
+          tierClass: 'tier-max',
+          presetVal: '600',
+          badgeText: '6×',
+          badgeColor: '#EF4444',
+          eqMode: 'balanced',
+          bass: 0,
+          showDrawer: false,
+          theme: 'dark'
+        }
+      },
+      2: {
+        badge: 'PRO AUDIO EQUALIZER (EQ)',
+        title: '4 Tailored<br/>Sound Profiles',
+        subtitle: 'One-click acoustic presets tuned for studio music, bass-heavy EDM, clear speech, and cinematic surround sound.',
+        bullets: [
+          { icon: '🎧', title: 'Balanced (Studio Reference)', desc: 'True-to-source natural frequency response for all music genres.' },
+          { icon: '🔊', title: 'Bass Boost (Punchy Low-End)', desc: 'Rich, thumping low-end enhancement for EDM, hip-hop, and beat lovers.' },
+          { icon: '🗣️', title: 'Vocal Clear (Dialogue Focus)', desc: 'Crisp speech boost ideal for podcasts, audiobooks, lectures, and calls.' },
+          { icon: '🎬', title: 'Cinema 3D (Spatial Surround)', desc: 'Expansive dynamic soundstage bringing Hollywood movies and gaming to life.' }
+        ],
+        callout: { text: '🎵 4 DSP Sound Profiles', top: '265px', left: '-60px' },
+        popupConfig: {
+          gain: 1.5,
+          pct: '150%',
+          subtext: '1.50× gain',
+          statusLabel: 'BOOSTED',
+          statusClass: 'status-boosted',
+          tierClass: 'tier-boosted',
+          presetVal: '150',
+          badgeText: '1.5×',
+          badgeColor: '#8B5CF6',
+          eqMode: 'bass',
+          bass: 4,
+          showDrawer: false,
+          theme: 'dark'
+        }
+      },
+      3: {
+        badge: 'SUBWOOFER BASS ENHANCER',
+        title: 'Dedicated<br/>Sub-Bass Booster',
+        subtitle: 'Feel the rumble with an independent Low-Shelf DSP filter engineered to amplify sub-bass frequencies up to +15 dB.',
+        bullets: [
+          { icon: '🎛️', title: 'Granular +0 to +15 dB Slider', desc: 'Precision control to dial in the exact amount of low-frequency punch you want.' },
+          { icon: '💻', title: 'Laptop Speaker Enhancement', desc: 'Revitalize thin, tinny laptop and monitor speakers with deep warm tone.' },
+          { icon: '🎧', title: 'Headphone Subwoofer Feel', desc: 'Transform standard headphones into rich, club-ready bass monitors.' },
+          { icon: '⚡', title: 'Zero Audio Latency', desc: 'Sub-millisecond processing pipeline for perfectly in-sync video playback.' }
+        ],
+        callout: { text: '🔊 +15 dB Sub-Bass DSP', top: '305px', left: '-55px' },
+        popupConfig: {
+          gain: 2.0,
+          pct: '200%',
+          subtext: '2.00× gain',
+          statusLabel: 'BOOSTED',
+          statusClass: 'status-boosted',
+          tierClass: 'tier-boosted',
+          presetVal: '200',
+          badgeText: '2×',
+          badgeColor: '#2563EB',
+          eqMode: 'bass',
+          bass: 12,
+          showDrawer: false,
+          theme: 'dark'
+        }
+      },
+      4: {
+        badge: 'DYNAMIC THEME ENGINE',
+        title: 'Sleek Dark &<br/>Crisp Light Mode',
+        subtitle: 'Seamless 1-click theme toggling with high-contrast typography and automatic system preference detection.',
+        bullets: [
+          { icon: '🌙', title: 'Deep Midnight Dark Mode', desc: 'OLED-friendly dark palette that prevents eye strain during night sessions.' },
+          { icon: '☀️', title: 'Clean Crisp Light Mode', desc: 'Ultra-modern, high-contrast light theme for bright daytime environments.' },
+          { icon: '💾', title: 'Persistent Theme Memory', desc: 'Remembers your preferred color scheme across browser tabs and restarts.' },
+          { icon: '🎨', title: 'CSS Custom Property Core', desc: 'Instant 60fps transitions with zero layout shift and zero lag.' }
+        ],
+        callout: { text: '☀️/🌙 Instant Theme Switch', top: '20px', left: '-50px' },
+        popupConfig: {
+          gain: 3.0,
+          pct: '300%',
+          subtext: '3.00× gain',
+          statusLabel: 'BOOSTED',
+          statusClass: 'status-boosted',
+          tierClass: 'tier-high',
+          presetVal: '300',
+          badgeText: '3×',
+          badgeColor: '#2563EB',
+          eqMode: 'cinema',
+          bass: 6,
+          showDrawer: false,
+          theme: 'both'
+        }
+      },
+      5: {
+        badge: 'PRO AUDIO SUITE & SHORTCUTS',
+        title: 'Stereo Balance &<br/>Audio Controls',
+        subtitle: 'Fine-tune Left/Right stereo panning, monitor safety compression, and use global shortcuts without opening the popup.',
+        bullets: [
+          { icon: '⚖️', title: 'L / R Stereo Panner', desc: 'Adjust channel balance to fix uneven recordings or accommodate single-ear listening.' },
+          { icon: '⌨️', title: 'Global Keyboard Shortcuts', desc: 'Press Ctrl+Shift+↑ to amplify or Ctrl+Shift+↓ to decrease gain on active tab.' },
+          { icon: '🛡️', title: 'Soft-Knee Clipping Protection', desc: 'Intelligent limiter guards your hearing and speakers from harsh distortion.' },
+          { icon: '🔒', title: '100% Client-Side Privacy', desc: 'All audio processing happens in local browser memory. Zero tracking.' }
+        ],
+        callout: { text: '⚙️ Audio FX Settings Drawer', top: '150px', left: '-60px' },
+        popupConfig: {
+          gain: 1.0,
+          pct: '100%',
+          subtext: '1.00× (Baseline)',
+          statusLabel: 'IDLE',
+          statusClass: 'status-idle',
+          tierClass: 'tier-normal',
+          presetVal: '100',
+          badgeText: '1×',
+          badgeColor: '#8B5CF6',
+          eqMode: 'balanced',
+          bass: 0,
+          showDrawer: true,
+          theme: 'dark'
+        }
+      }
+    };
+
+    const data = SHOTS_DATA[shot] || SHOTS_DATA[1];
+
+    // Populate Left Content
+    document.getElementById('badge-text').textContent = data.badge;
+    document.getElementById('promo-title').innerHTML = data.title;
+    document.getElementById('promo-subtitle').textContent = data.subtitle;
+
+    const bulletsContainer = document.getElementById('bullets-container');
+    bulletsContainer.innerHTML = '';
+    data.bullets.forEach(b => {
+      const div = document.createElement('div');
+      div.className = 'bullet-item';
+      div.innerHTML = `
+        <span class="bullet-icon">${b.icon}</span>
+        <div>
+          <div class="bullet-text-title">${b.title}</div>
+          <div class="bullet-text-desc">${b.desc}</div>
+        </div>
+      `;
+      bulletsContainer.appendChild(div);
+    });
+
+    // Populate Right Mockup Stage
+    const mockupContainer = document.getElementById('mockup-container');
+    mockupContainer.innerHTML = '';
+
+    if (data.popupConfig.theme === 'both') {
+      // Dual Mockup (Shot 4)
+      mockupContainer.innerHTML = `
+        <div class="dual-mockup-wrapper">
+          <!-- Dark Frame -->
+          <div class="dual-frame" data-theme="dark">
+            <div class="chrome-toolbar">
+              <div class="traffic-lights">
+                <span class="traffic-light tl-red"></span>
+                <span class="traffic-light tl-yellow"></span>
+                <span class="traffic-light tl-green"></span>
+              </div>
+              <div class="address-bar">
+                <span>🌙 Dark Mode</span>
+              </div>
+              <div class="badge-icon-box">
+                <img src="icons/icon32.png" width="16" height="16" />
+                <span class="badge-pill" style="background:#2563EB;">3×</span>
+              </div>
+            </div>
+            ${generatePopupHTML(data.popupConfig, 'dark')}
+          </div>
+
+          <!-- Light Frame -->
+          <div class="dual-frame light" data-theme="light">
+            <div class="chrome-toolbar" style="background:#F1F5F9; border-color:#E2E8F0;">
+              <div class="traffic-lights">
+                <span class="traffic-light tl-red"></span>
+                <span class="traffic-light tl-yellow"></span>
+                <span class="traffic-light tl-green"></span>
+              </div>
+              <div class="address-bar" style="background:#FFFFFF; color:#334155; border-color:#CBD5E1;">
+                <span>☀️ Light Mode</span>
+              </div>
+              <div class="badge-icon-box">
+                <img src="icons/icon32.png" width="16" height="16" />
+                <span class="badge-pill" style="background:#2563EB;">3×</span>
+              </div>
+            </div>
+            ${generatePopupHTML(data.popupConfig, 'light')}
+          </div>
+        </div>
+        <div class="callout-badge" style="top: ${data.callout.top}; left: ${data.callout.left};">
+          ${data.callout.text}
+        </div>
+      `;
+    } else {
+      // Standard Single Frame
+      mockupContainer.innerHTML = `
+        <div class="chrome-frame" data-theme="${data.popupConfig.theme}">
+          <div class="chrome-toolbar">
+            <div class="traffic-lights">
+              <span class="traffic-light tl-red"></span>
+              <span class="traffic-light tl-yellow"></span>
+              <span class="traffic-light tl-green"></span>
+            </div>
+            <div class="address-bar">
+              <span style="color:#10B981;">●</span>
+              <span>youtube.com</span>
+            </div>
+            <div class="badge-icon-box">
+              <img src="icons/icon32.png" width="16" height="16" />
+              <span class="badge-pill" style="background:${data.popupConfig.badgeColor};">${data.popupConfig.badgeText}</span>
+            </div>
+          </div>
+          ${generatePopupHTML(data.popupConfig, data.popupConfig.theme)}
+        </div>
+        <div class="callout-badge" style="top: ${data.callout.top}; left: ${data.callout.left};">
+          ${data.callout.text}
+        </div>
+      `;
+    }
+
+    // Animate mini canvas
+    setTimeout(() => {
+      document.querySelectorAll('.mini-canvas-render').forEach(canvas => {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const bars = 16;
+        const barWidth = width / bars;
+        
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < bars; i++) {
+          const h = (Math.sin(i * 0.6) * 0.5 + 0.5) * (height - 4) + 4;
+          ctx.fillStyle = data.popupConfig.gain >= 4.0 ? '#F59E0B' : '#38BDF8';
+          ctx.fillRect(i * barWidth + 1, height - h, barWidth - 2, h);
+        }
+      });
+    }, 50);
+
+    function generatePopupHTML(cfg, theme) {
+      const sliderPct = (parseFloat(cfg.gain) / 6.0) * 100;
+      const sliderBg = cfg.gain >= 4.0 ? '#F59E0B' : (cfg.gain > 1.0 ? '#8B5CF6' : '#38BDF8');
+      const trackBg = theme === 'light' ? '#E2E8F0' : '#252542';
+
+      return `
+        <div class="app-wrapper" data-theme="${theme}" style="transform-origin: top left;">
+          
+          <!-- Top Bar -->
+          <div class="top-bar">
+            <div class="brand-wrapper">
+              <svg class="brand-speaker-glow" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="#38BDF8" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="#8B5CF6" stroke-width="2.3" stroke-linecap="round"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="#EC4899" stroke-width="2.3" stroke-linecap="round"/>
+              </svg>
+              <span class="brand-title">Volume Booster</span>
+              <span class="pro-chip">PRO</span>
+            </div>
+            <div class="top-actions">
+              <button class="btn-icon btn-theme">
+                ${theme === 'light' ? 
+                  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>` : 
+                  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>`
+                }
+              </button>
+              <button class="btn-icon ${cfg.showDrawer ? 'active' : ''}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Domain Bar -->
+          <div class="domain-bar">
+            <div class="favicon-box"><span>▶</span></div>
+            <span class="domain-text">youtube.com</span>
+            <span class="status-badge status-active">● Enabled</span>
+          </div>
+
+          <!-- Volume Card -->
+          <div class="volume-card">
+            <div class="card-top">
+              <div class="status-row">
+                <div class="status-dot ${cfg.statusClass}"></div>
+                <span class="status-label ${cfg.statusClass}">${cfg.statusLabel}</span>
+              </div>
+              <div class="volume-number ${cfg.tierClass}">${cfg.pct}</div>
+              <div class="gain-subtext">${cfg.subtext}</div>
+              <div class="visualizer-wrapper">
+                <canvas class="mini-canvas-render" width="160" height="16" style="width:100%; height:16px; border-radius:4px;"></canvas>
+              </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="slider-area">
+              <div class="slider-labels">
+                <span>0%</span><span>150%</span><span>300%</span><span>450%</span><span>600%</span>
+              </div>
+              <input type="range" min="0" max="600" value="${parseFloat(cfg.gain)*100}" class="volume-slider" style="background: linear-gradient(to right, ${sliderBg} ${sliderPct}%, ${trackBg} ${sliderPct}%);" />
+              <div class="presets-row">
+                <button class="preset-btn ${cfg.presetVal==='100'?'active':''}">1×</button>
+                <button class="preset-btn ${cfg.presetVal==='150'?'active':''}">1.5×</button>
+                <button class="preset-btn ${cfg.presetVal==='200'?'active':''}">2×</button>
+                <button class="preset-btn ${cfg.presetVal==='300'?'active':''}">3×</button>
+                <button class="preset-btn ${cfg.presetVal==='400'?'active':''}">4×</button>
+                <button class="preset-btn ${cfg.presetVal==='600'?'active':''}">6×</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pro DSP Card -->
+          <div class="section-card">
+            <div class="section-header">
+              <span class="section-title">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                Sound Profile (EQ)
+              </span>
+              <span class="profile-pill">${cfg.eqMode.toUpperCase()}</span>
+            </div>
+            <div class="modes-grid">
+              <button class="mode-btn ${cfg.eqMode==='balanced'?'active':''}">
+                <span class="mode-icon">🎧</span><span class="mode-name">Balanced</span>
+              </button>
+              <button class="mode-btn ${cfg.eqMode==='bass'?'active':''}">
+                <span class="mode-icon">🔊</span><span class="mode-name">Bass Boost</span>
+              </button>
+              <button class="mode-btn ${cfg.eqMode==='vocal'?'active':''}">
+                <span class="mode-icon">🗣️</span><span class="mode-name">Vocal Clear</span>
+              </button>
+              <button class="mode-btn ${cfg.eqMode==='cinema'?'active':''}">
+                <span class="mode-icon">🎬</span><span class="mode-name">Cinema 3D</span>
+              </button>
+            </div>
+            <div class="bass-control-wrapper">
+              <div class="section-header bass-header">
+                <span class="section-title">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Sub-Bass Booster
+                </span>
+                <span class="bass-value-pill">+${cfg.bass} dB</span>
+              </div>
+              <input type="range" min="0" max="15" value="${cfg.bass}" class="bass-slider" />
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="actions-row">
+            <button class="btn-boost state-active">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="15" y1="9" x2="15" y2="15"/><line x1="19" y1="7" x2="19" y2="17"/><line x1="23" y1="5" x2="23" y2="19"/></svg>
+              <span>Boost Active</span>
+            </button>
+            <button class="btn-action">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            </button>
+            <button class="btn-action btn-reset-action">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.67"/></svg>
+            </button>
+          </div>
+
+          <!-- Footer Bar -->
+          <div class="footer-bar">
+            <div class="hotkey-tip">
+              <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
+              <span class="hotkey-label">to adjust boost</span>
+            </div>
+          </div>
+
+          <!-- Settings Drawer (Shown if cfg.showDrawer is true) -->
+          <div class="settings-drawer ${cfg.showDrawer ? '' : 'hidden'}">
+            <div class="drawer-header">
+              <span class="drawer-title">Audio Settings & Balance</span>
+              <button class="btn-icon">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="drawer-body">
+              <div class="section-header">
+                <span class="section-title">Stereo Balance (L / R)</span>
+                <button class="btn-pill-reset">Center</button>
+              </div>
+              <div class="pan-control-row">
+                <span class="pan-label">L</span>
+                <input type="range" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
+                <span class="pan-label">R</span>
+              </div>
+              
+              <!-- Additional Pro Setting Rows in Drawer -->
+              <div class="settings-drawer-preview">
+                <div class="settings-row">
+                  <span class="settings-label">🛡️ Soft-Knee Limiter</span>
+                  <span class="settings-val">PROTECTED</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">🎧 Downmix To Mono</span>
+                  <span class="settings-val" style="color:#64748B;">OFF (STEREO)</span>
+                </div>
+                <div class="settings-row">
+                  <span class="settings-label">⌨️ Shortcuts Enabled</span>
+                  <span class="settings-val">CTRL+SHIFT+↑↓</span>
+                </div>
+              </div>
+
+              <p class="drawer-tip">Tip: Press Ctrl+Shift+Up/Down on any tab to amplify volume instantly.</p>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
