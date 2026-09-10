@@ -133,11 +133,11 @@ PERMISSIONS JUSTIFICATION (Copy & paste into Chrome Developer Dashboard):
 3. activeTab:
 "Used to inspect the active tab's domain URL to display current media playback status in the extension popup and enable keyboard shortcut volume control on the active tab."
 
-4. scripting:
-"Used to inject lightweight helper scripts to coordinate media stream routing and handle playback state changes seamlessly."
-
-5. offscreen:
+4. offscreen:
 "Used to run a persistent Web Audio API AudioContext pipeline in an isolated offscreen document so that boosted audio playback continues without interruption when the user closes the extension popup or navigates the active tab."
+
+5. host_permissions (<all_urls>):
+"Required to allow audio amplification across all web domains where media or video content is played (e.g. YouTube, Netflix, Spotify, Prime Video, Vimeo, Twitch) upon user activation."
 
 DATA USAGE & PRIVACY DECLARATION:
 • Do you collect any personal data? NO
