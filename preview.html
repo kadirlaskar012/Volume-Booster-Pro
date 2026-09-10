@@ -97,8 +97,8 @@
           </div>
         </div>
 
-        <!-- The Actual Popup Container -->
-        <div class="w-full bg-dark text-slate-100 font-sans overflow-hidden">
+        <!-- The Actual Popup Container (Relative for Drawer Overlay) -->
+        <div class="w-full bg-dark text-slate-100 font-sans overflow-hidden relative">
 
           <!-- Top Bar (Branded Gradient Speaker & Strong Hierarchy) -->
           <div class="flex items-center justify-between px-5 pt-4 pb-2">
@@ -117,12 +117,32 @@
               <span class="text-sm font-bold tracking-wide text-white">Volume Booster Pro</span>
             </div>
 
-            <button id="btn-settings" title="Settings (Pro)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-border transition-all duration-200">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </button>
+            <div class="top-actions flex items-center gap-1.5">
+              <!-- Theme Toggle Button -->
+              <button id="btn-theme" title="Toggle Light/Dark Theme" class="btn-icon btn-theme" aria-label="Toggle Theme">
+                <svg id="theme-icon-sun" class="theme-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/>
+                  <line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="theme-icon-moon" class="theme-icon hidden" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </button>
+
+              <button id="btn-settings" title="Settings (Pro)" class="btn-icon" aria-label="Settings">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <!-- Domain Info Bar (Hierarchy: Subordinate 11px font) -->
@@ -279,16 +299,25 @@
             <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
           </div>
 
-          <!-- Pro Settings Panel (Collapsible) -->
-          <div id="settings-panel" class="hidden fx-panel">
-            <div class="section-header">
-              <span class="section-title">Stereo Balance (L / R)</span>
-              <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+          <!-- Pro Settings Panel (Collapsible Overlay Drawer) -->
+          <div id="settings-panel" class="hidden settings-drawer">
+            <div class="drawer-header">
+              <span class="drawer-title">Audio Settings & Balance</span>
+              <button id="btn-close-settings" class="btn-icon" title="Close" aria-label="Close Settings">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
-            <div class="pan-control-row">
-              <span class="pan-label">L</span>
-              <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
-              <span class="pan-label">R</span>
+            <div class="drawer-body">
+              <div class="section-header">
+                <span class="section-title">Stereo Balance (L / R)</span>
+                <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+              </div>
+              <div class="pan-control-row">
+                <span class="pan-label">L</span>
+                <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
+                <span class="pan-label">R</span>
+              </div>
+              <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
             </div>
           </div>
 
@@ -428,7 +457,8 @@
       domain: 'youtube.com',
       bass: 0,             // 0 to 15 dB
       eqMode: 'balanced',  // 'balanced' | 'bass' | 'vocal' | 'cinema'
-      pan: 0               // -1 to +1
+      pan: 0,              // -1 to +1
+      theme: 'dark'
     };
 
     const EQ_PRESETS = {
@@ -455,7 +485,11 @@
     const btnBoostText = document.getElementById('boost-btn-text');
     const btnMute = document.getElementById('btn-mute');
     const btnReset = document.getElementById('btn-reset');
+    const btnTheme = document.getElementById('btn-theme');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
     const btnSettings = document.getElementById('btn-settings');
+    const btnCloseSettings = document.getElementById('btn-close-settings');
     const settingsPanel = document.getElementById('settings-panel');
     const btnPlayDemo = document.getElementById('btn-play-demo');
     const playBtnLabel = document.getElementById('play-btn-label');
@@ -854,10 +888,40 @@
       syncUI();
     });
 
+    // Theme Toggling
+    function applyTheme(theme) {
+      state.theme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      if (themeIconSun && themeIconMoon) {
+        if (theme === 'light') {
+          themeIconSun.classList.add('hidden');
+          themeIconMoon.classList.remove('hidden');
+        } else {
+          themeIconSun.classList.remove('hidden');
+          themeIconMoon.classList.add('hidden');
+        }
+      }
+    }
+
+    if (btnTheme) {
+      btnTheme.addEventListener('click', () => {
+        const next = state.theme === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+      });
+    }
+
+    // Settings Drawer
     btnSettings.addEventListener('click', () => {
-      settingsPanel.classList.toggle('hidden');
-      btnSettings.classList.toggle('active', !settingsPanel.classList.contains('hidden'));
+      settingsPanel.classList.remove('hidden');
+      btnSettings.classList.add('active');
     });
+
+    if (btnCloseSettings) {
+      btnCloseSettings.addEventListener('click', () => {
+        settingsPanel.classList.add('hidden');
+        btnSettings.classList.remove('active');
+      });
+    }
 
     modeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -887,7 +951,8 @@
       });
     }
 
-    // Initialize UI on load
+    // Initialize UI and Theme on load
+    applyTheme('dark');
     syncUI();
   </script>
 </body>

@@ -1,27 +1,13 @@
 /**
- * popup.js — Volume Booster Pro (Ultra Edition)
+ * popup.js — Volume Booster Pro (Ultra Edition — 60fps Butter Smooth)
  *
- * Architecture & Unified Audio Engine:
+ * Architecture & Performance Optimization:
  * ──────────────────────────────────────────────────────────────────────────
- * - Central Single Source of Truth (`state`) controlling all UI and audio parameters.
- * - Full Web Audio API DSP pipeline:
- *     MediaStream (from tabCapture)
- *         ↓
- *     BiquadFilterNode (Sub-Bass Lowshelf @ 140Hz)
- *         ↓
- *     BiquadFilterNode (EQ Mid Peaking @ 2.5kHz)
- *         ↓
- *     BiquadFilterNode (EQ High Highshelf @ 8.0kHz)
- *         ↓
- *     StereoPannerNode (L / R Pan Balance)
- *         ↓
- *     GainNode (Volume Amplification 0% – 600%)
- *         ↓
- *     MediaStreamDestinationNode ──→ AudioElement (Playback to Speakers)
- *         ↓
- *     AnalyserNode (FFT 64) ──→ Live 24-Bar Popup Spectrum Canvas
- *
- * - Offline-first, CSP-compliant, zero external dependencies.
+ * - Zero Disk/IPC Choke: Audio & UI updates run at 60fps via requestAnimationFrame;
+ *   storage persistence and background badge messages are debounced.
+ * - Smooth Web Audio DSP: Uses setTargetAtTime() for click-free exponential smoothing.
+ * - Light/Dark Theme System: Persisted in chrome.storage.local, respects prefers-color-scheme.
+ * - Fixed Frame: Never resizes or overflows outside 320px x 420px.
  */
 
 'use strict';
@@ -52,7 +38,11 @@ const btnBoost           = document.getElementById('btn-boost');
 const btnBoostText       = document.getElementById('boost-btn-text');
 const btnMute            = document.getElementById('btn-mute');
 const btnReset           = document.getElementById('btn-reset');
+const btnTheme           = document.getElementById('btn-theme');
+const themeIconSun       = document.getElementById('theme-icon-sun');
+const themeIconMoon      = document.getElementById('theme-icon-moon');
 const btnSettings        = document.getElementById('btn-settings');
+const btnCloseSettings   = document.getElementById('btn-close-settings');
 const settingsPanel      = document.getElementById('settings-panel');
 const presetBtns         = document.querySelectorAll('.preset-btn');
 const modeBtns           = document.querySelectorAll('.mode-btn');
@@ -72,7 +62,8 @@ const state = {
   tabId: null,            // active tab id
   bass: 0,                // Sub-bass boost: 0 to 15 dB
   eqMode: 'balanced',     // 'balanced' | 'bass' | 'vocal' | 'cinema'
-  pan: 0                  // Stereo pan: -1.0 (Left) to +1.0 (Right)
+  pan: 0,                 // Stereo pan: -1.0 to +1.0
+  theme: 'dark'           // 'dark' | 'light'
 };
 
 // ─── Sound Profile EQ Definitions ──────────────────────────────────────────
@@ -98,6 +89,48 @@ let captureStream  = null;  // MediaStream from tabCapture
 let vizCtx         = null;  // Canvas 2D context
 let vizAnimId      = null;  // requestAnimationFrame ID
 let previewSynth   = null;  // For standalone preview mode
+let cachedFreqData = null;  // Reused Uint8Array for visualizer
+
+// ─── Debouncing & RAF Optimization Variables ───────────────────────────────
+let rafSyncId      = null;
+let saveDebounceId = null;
+
+/**
+ * Schedule UI update on next animation frame to prevent layout thrashing
+ */
+function scheduleSyncUI() {
+  if (rafSyncId) return;
+  rafSyncId = requestAnimationFrame(() => {
+    rafSyncId = null;
+    syncUI();
+  });
+}
+
+/**
+ * Debounce disk storage and IPC badge updates so slider moves at 60fps smoothly
+ */
+function scheduleSaveSettings(immediate = false) {
+  if (saveDebounceId) clearTimeout(saveDebounceId);
+  if (immediate) {
+    saveDomainSettings();
+    sendGainToBackground();
+  } else {
+    saveDebounceId = setTimeout(() => {
+      saveDomainSettings();
+      sendGainToBackground();
+    }, 200);
+  }
+}
+
+function sendGainToBackground() {
+  if (isExtensionContext && state.tabId) {
+    chrome.runtime.sendMessage({
+      type: 'SET_GAIN',
+      tabId: state.tabId,
+      gain: state.gain
+    }).catch(() => {});
+  }
+}
 
 // ─── Unified UI Synchronization ────────────────────────────────────────────
 function syncUI() {
@@ -105,19 +138,12 @@ function syncUI() {
   const actualPct = Math.round(state.gain * 100);
   const effectivePct = Math.round(effectiveGain * 100);
 
-  // 1. Slider value and dynamic gradient track
+  // 1. Slider value and dynamic gradient track (High Contrast)
   if (volumeSlider) {
     volumeSlider.value = actualPct;
     const fillPercentage = (actualPct / 600) * 100;
-    let trackColor = '#38BDF8';
-    if (actualPct >= 450) {
-      trackColor = 'linear-gradient(to right, #F59E0B, #EF4444)';
-    } else if (actualPct >= 300) {
-      trackColor = 'linear-gradient(to right, #8B5CF6, #EC4899)';
-    } else if (actualPct > 100) {
-      trackColor = 'linear-gradient(to right, #38BDF8, #8B5CF6)';
-    }
-    volumeSlider.style.background = `linear-gradient(to right, ${actualPct >= 300 ? '#8B5CF6' : '#38BDF8'} ${fillPercentage}%, #252542 ${fillPercentage}%)`;
+    const fillStop = actualPct >= 300 ? '#6366F1' : '#38BDF8';
+    volumeSlider.style.background = `linear-gradient(to right, ${fillStop} ${fillPercentage}%, var(--slider-track) ${fillPercentage}%)`;
   }
 
   // 2. Big Percentage Number & Ambient Glow
@@ -160,13 +186,13 @@ function syncUI() {
   // 3. Dynamic Glow Orb based on Volume Boost Level
   if (glowOrb) {
     if (state.isMuted || effectivePct === 0) {
-      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(100, 116, 139, 0.15) 0%, transparent 70%)';
+      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(100, 116, 139, 0.12) 0%, transparent 70%)';
     } else if (effectivePct >= 400) {
-      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.35) 0%, transparent 70%)';
+      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.3) 0%, transparent 70%)';
     } else if (effectivePct > 100) {
-      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.35) 0%, transparent 70%)';
+      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 70%)';
     } else {
-      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.28) 0%, transparent 70%)';
+      glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 70%)';
     }
   }
 
@@ -248,16 +274,14 @@ function syncUI() {
   if (panSlider) panSlider.value = state.pan;
 }
 
-// ─── Web Audio API Parameter Application ───────────────────────────────────
+// ─── Web Audio API Parameter Application (Click-free setTargetAtTime) ───────
 function applyGain() {
   if (!gainNode || !audioCtx) return;
   const factor = isExtensionContext ? 1.0 : 0.12;
   const effectiveGain = state.isMuted ? 0 : state.gain * factor;
 
-  const now = audioCtx.currentTime;
-  gainNode.gain.cancelScheduledValues(now);
-  gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-  gainNode.gain.linearRampToValueAtTime(effectiveGain, now + 0.05); // Smooth 50ms transition
+  // W3C recommended smooth parameter transition without audio-thread clicks
+  gainNode.gain.setTargetAtTime(effectiveGain, audioCtx.currentTime, 0.015);
 }
 
 function applyEqProfile(mode, smooth = true) {
@@ -274,24 +298,17 @@ function applyEqProfile(mode, smooth = true) {
   });
 
   if (!audioCtx) return;
-  const now = audioCtx.currentTime;
-  const rampTime = smooth ? now + 0.08 : now;
+  const timeConst = smooth ? 0.03 : 0.001;
 
   const targetBass = Math.min(18, Math.max(0, state.bass + preset.bassAdd));
   if (bassFilter) {
-    bassFilter.gain.cancelScheduledValues(now);
-    bassFilter.gain.setValueAtTime(bassFilter.gain.value, now);
-    bassFilter.gain.linearRampToValueAtTime(targetBass, rampTime);
+    bassFilter.gain.setTargetAtTime(targetBass, audioCtx.currentTime, timeConst);
   }
   if (eqMidFilter) {
-    eqMidFilter.gain.cancelScheduledValues(now);
-    eqMidFilter.gain.setValueAtTime(eqMidFilter.gain.value, now);
-    eqMidFilter.gain.linearRampToValueAtTime(preset.midGain, rampTime);
+    eqMidFilter.gain.setTargetAtTime(preset.midGain, audioCtx.currentTime, timeConst);
   }
   if (eqHighFilter) {
-    eqHighFilter.gain.cancelScheduledValues(now);
-    eqHighFilter.gain.setValueAtTime(eqHighFilter.gain.value, now);
-    eqHighFilter.gain.linearRampToValueAtTime(preset.highGain, rampTime);
+    eqHighFilter.gain.setTargetAtTime(preset.highGain, audioCtx.currentTime, timeConst);
   }
 }
 
@@ -302,10 +319,7 @@ function applyBass(bassValue) {
   if (bassFilter && audioCtx) {
     const preset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
     const targetBass = Math.min(18, Math.max(0, state.bass + preset.bassAdd));
-    const now = audioCtx.currentTime;
-    bassFilter.gain.cancelScheduledValues(now);
-    bassFilter.gain.setValueAtTime(bassFilter.gain.value, now);
-    bassFilter.gain.linearRampToValueAtTime(targetBass, now + 0.05);
+    bassFilter.gain.setTargetAtTime(targetBass, audioCtx.currentTime, 0.015);
   }
 }
 
@@ -314,10 +328,35 @@ function applyPan(panValue) {
   if (panSlider) panSlider.value = state.pan;
 
   if (panNode && audioCtx) {
-    const now = audioCtx.currentTime;
-    panNode.pan.cancelScheduledValues(now);
-    panNode.pan.setValueAtTime(state.pan, now);
+    panNode.pan.setTargetAtTime(state.pan, audioCtx.currentTime, 0.015);
   }
+}
+
+// ─── Theme Management (Light / Dark) ───────────────────────────────────────
+function applyTheme(theme) {
+  state.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+
+  if (themeIconSun && themeIconMoon) {
+    if (theme === 'light') {
+      themeIconSun.classList.add('hidden');
+      themeIconMoon.classList.remove('hidden');
+      if (btnTheme) btnTheme.title = 'Switch to Dark Theme';
+    } else {
+      themeIconSun.classList.remove('hidden');
+      themeIconMoon.classList.add('hidden');
+      if (btnTheme) btnTheme.title = 'Switch to Light Theme';
+    }
+  }
+
+  if (chrome?.storage?.local) {
+    chrome.storage.local.set({ app_theme: theme }).catch(() => {});
+  }
+}
+
+function toggleTheme() {
+  const newTheme = state.theme === 'light' ? 'dark' : 'light';
+  applyTheme(newTheme);
 }
 
 // ─── Persistence Helper ────────────────────────────────────────────────────
@@ -334,28 +373,20 @@ async function saveDomainSettings() {
 }
 
 // ─── State Mutation Handlers ───────────────────────────────────────────────
-async function setGain(newGain) {
+function setGain(newGain, immediateSave = false) {
   state.gain = Math.min(MAX_GAIN, Math.max(MIN_GAIN, newGain));
   state.isMuted = false;
 
   applyGain();
-  syncUI();
-  saveDomainSettings();
-
-  if (isExtensionContext && state.tabId) {
-    await chrome.runtime.sendMessage({
-      type: 'SET_GAIN',
-      tabId: state.tabId,
-      gain: state.gain
-    }).catch(() => {});
-  }
+  scheduleSyncUI();
+  scheduleSaveSettings(immediateSave);
 }
 
 async function toggleMute() {
   state.isMuted = !state.isMuted;
 
   applyGain();
-  syncUI();
+  scheduleSyncUI();
 
   if (isExtensionContext && state.tabId) {
     await chrome.runtime.sendMessage({
@@ -377,9 +408,9 @@ async function resetVolume() {
   applyEqProfile('balanced');
   applyBass(0);
   applyPan(0);
-  syncUI();
+  scheduleSyncUI();
   hideError();
-  saveDomainSettings();
+  scheduleSaveSettings(true);
 
   if (isExtensionContext && state.tabId) {
     await chrome.runtime.sendMessage({
@@ -389,13 +420,14 @@ async function resetVolume() {
   }
 }
 
-// ─── Live Popup Spectrum Visualizer Canvas ─────────────────────────────────
+// ─── Live Popup Spectrum Visualizer Canvas (Lightweight & Smooth) ──────────
 function setupVisualizer() {
   if (!popupVisualizer) return;
-  const rect = popupVisualizer.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  popupVisualizer.width = (rect.width || 290) * dpr;
-  popupVisualizer.height = 18 * dpr;
+  const rectWidth = 280; // Fixed canvas logical width
+  const rectHeight = 16; // Fixed canvas logical height
+  popupVisualizer.width = rectWidth * dpr;
+  popupVisualizer.height = rectHeight * dpr;
   vizCtx = popupVisualizer.getContext('2d');
   vizCtx.scale(dpr, dpr);
 }
@@ -410,19 +442,22 @@ function drawPopupVisualizer() {
   vizAnimId = requestAnimationFrame(drawPopupVisualizer);
   if (!popupVisualizer || !vizCtx) return;
 
-  const width = popupVisualizer.width / (window.devicePixelRatio || 1);
-  const height = popupVisualizer.height / (window.devicePixelRatio || 1);
+  const width = 280;
+  const height = 16;
 
   vizCtx.clearRect(0, 0, width, height);
 
-  const numBars = 22;
+  const numBars = 20;
   const barGap = 3;
   const barWidth = (width - (numBars - 1) * barGap) / numBars;
 
-  let freqData = null;
+  let hasAudio = false;
   if (analyserNode && state.isCapturing && !state.isMuted) {
-    freqData = new Uint8Array(analyserNode.frequencyBinCount);
-    analyserNode.getByteFrequencyData(freqData);
+    if (!cachedFreqData || cachedFreqData.length !== analyserNode.frequencyBinCount) {
+      cachedFreqData = new Uint8Array(analyserNode.frequencyBinCount);
+    }
+    analyserNode.getByteFrequencyData(cachedFreqData);
+    hasAudio = true;
   }
 
   const effectiveGain = state.isMuted ? 0 : state.gain;
@@ -431,44 +466,33 @@ function drawPopupVisualizer() {
   // Dynamic bar colors based on boost tier
   let gradColor1 = '#06B6D4';
   let gradColor2 = '#38BDF8';
-  if (actualPct >= 450) {
+  if (actualPct >= 400) {
     gradColor1 = '#F59E0B';
     gradColor2 = '#EF4444';
-  } else if (actualPct >= 300) {
-    gradColor1 = '#EC4899';
-    gradColor2 = '#F43F5E';
-  } else if (actualPct > 100) {
+  } else if (actualPct > 150) {
     gradColor1 = '#8B5CF6';
     gradColor2 = '#C084FC';
   }
 
   for (let i = 0; i < numBars; i++) {
-    let barHeight = 2; // Resting baseline dot
+    let barHeight = 2; // Baseline dot
 
-    if (freqData && freqData.length > 0) {
-      // Map bins across the audible spectrum
-      const binIdx = Math.min(freqData.length - 1, Math.floor(i * (freqData.length / numBars)));
-      const rawAmp = freqData[binIdx] / 255;
-      const boostMultiplier = 0.6 + 0.4 * (effectiveGain / 6.0);
+    if (hasAudio && cachedFreqData) {
+      const binIdx = Math.min(cachedFreqData.length - 1, Math.floor(i * (cachedFreqData.length / numBars)));
+      const rawAmp = cachedFreqData[binIdx] / 255;
+      const boostMultiplier = 0.5 + 0.5 * (effectiveGain / 6.0);
       barHeight = Math.max(2, rawAmp * (height - 2) * boostMultiplier);
     } else if (state.isCapturing && !state.isMuted) {
-      // Subtle idle breathing pulse when connected
+      // Gentle idle wave
       const time = Date.now() * 0.003;
-      barHeight = 2 + Math.sin(time + i * 0.35) * 2;
+      barHeight = 2 + Math.sin(time + i * 0.4) * 1.5;
     }
 
     const x = i * (barWidth + barGap);
     const y = height - barHeight;
 
-    // Gradient bar
-    const barGrad = vizCtx.createLinearGradient(0, height, 0, y);
-    barGrad.addColorStop(0, gradColor1);
-    barGrad.addColorStop(1, gradColor2);
-
-    vizCtx.fillStyle = barGrad;
-    vizCtx.beginPath();
-    vizCtx.roundRect(x, y, barWidth, barHeight, [2, 2, 0, 0]);
-    vizCtx.fill();
+    vizCtx.fillStyle = gradColor1;
+    vizCtx.fillRect(x, y, barWidth, barHeight);
   }
 }
 
@@ -488,7 +512,6 @@ async function startCapture() {
         await audioCtx.resume();
       }
 
-      // Synth demo generator
       const osc = audioCtx.createOscillator();
       const lfo = audioCtx.createOscillator();
       const lfoGain = audioCtx.createGain();
@@ -499,7 +522,6 @@ async function startCapture() {
       lfoGain.gain.setValueAtTime(10, audioCtx.currentTime);
       lfo.connect(osc.frequency);
 
-      // Web Audio DSP Chain
       bassFilter = audioCtx.createBiquadFilter();
       bassFilter.type = 'lowshelf';
       bassFilter.frequency.setValueAtTime(140, audioCtx.currentTime);
@@ -545,7 +567,7 @@ async function startCapture() {
       if (btnBoost) btnBoost.disabled = false;
       applyEqProfile(state.eqMode, false);
       startVisualizer();
-      syncUI();
+      scheduleSyncUI();
       return;
     }
 
@@ -572,45 +594,36 @@ async function startCapture() {
       await audioCtx.resume();
     }
 
-    // Source
     sourceNode = audioCtx.createMediaStreamSource(captureStream);
 
-    // Sub-Bass Filter (lowshelf @ 140Hz)
     bassFilter = audioCtx.createBiquadFilter();
     bassFilter.type = 'lowshelf';
     bassFilter.frequency.setValueAtTime(140, audioCtx.currentTime);
     bassFilter.gain.setValueAtTime(state.bass, audioCtx.currentTime);
 
-    // Mid EQ Filter (peaking @ 2.5kHz)
     eqMidFilter = audioCtx.createBiquadFilter();
     eqMidFilter.type = 'peaking';
     eqMidFilter.frequency.setValueAtTime(2500, audioCtx.currentTime);
     eqMidFilter.Q.setValueAtTime(1.0, audioCtx.currentTime);
 
-    // High EQ Filter (highshelf @ 8.0kHz)
     eqHighFilter = audioCtx.createBiquadFilter();
     eqHighFilter.type = 'highshelf';
     eqHighFilter.frequency.setValueAtTime(8000, audioCtx.currentTime);
 
-    // Stereo Panner
     if (audioCtx.createStereoPanner) {
       panNode = audioCtx.createStereoPanner();
       panNode.pan.setValueAtTime(state.pan, audioCtx.currentTime);
     }
 
-    // Master Gain
     gainNode = audioCtx.createGain();
     gainNode.gain.setValueAtTime(state.isMuted ? 0 : state.gain, audioCtx.currentTime);
 
-    // Destination for speaker playback
     destNode = audioCtx.createMediaStreamDestination();
 
-    // Analyser for live visualizer
     analyserNode = audioCtx.createAnalyser();
     analyserNode.fftSize = 64;
     analyserNode.smoothingTimeConstant = 0.8;
 
-    // Connect DSP Chain
     let lastNode = sourceNode;
     lastNode.connect(bassFilter);
     lastNode = bassFilter;
@@ -628,13 +641,11 @@ async function startCapture() {
     gainNode.connect(destNode);
     gainNode.connect(analyserNode);
 
-    // Audio element playback
     audioElement = new Audio();
     audioElement.srcObject = destNode.stream;
     audioElement.volume = 1.0;
     await audioElement.play();
 
-    // Handle track ended
     captureStream.getAudioTracks()[0].addEventListener('ended', () => {
       stopCapture(false);
     });
@@ -646,13 +657,13 @@ async function startCapture() {
     startVisualizer();
 
     await chrome.runtime.sendMessage({ type: 'START_CAPTURE', tabId: state.tabId }).catch(() => {});
-    syncUI();
+    scheduleSyncUI();
 
   } catch (err) {
     console.error('[VBP Popup] Capture failed:', err);
     state.isCapturing = false;
     if (btnBoost) btnBoost.disabled = false;
-    syncUI();
+    scheduleSyncUI();
 
     let friendlyMsg = err.message;
     if (err.message.includes('already active') || err.message.includes('already captured')) {
@@ -660,7 +671,7 @@ async function startCapture() {
     } else if (err.message.includes('permission')) {
       friendlyMsg = 'Permission denied. Please verify extension permissions in chrome://extensions.';
     } else if (err.message.includes('null stream')) {
-      friendlyMsg = 'Could not capture audio. Try playing audio on the webpage first, then click Enable Boost.';
+      friendlyMsg = 'Could not capture audio. Play audio on the page first, then click Enable Boost.';
     }
     showError(friendlyMsg);
   }
@@ -714,14 +725,11 @@ async function stopCapture(userInitiated = true) {
     await chrome.runtime.sendMessage({ type: 'STOP_CAPTURE', tabId: state.tabId }).catch(() => {});
   }
 
-  // Clear visualizer canvas
   if (popupVisualizer && vizCtx) {
-    const width = popupVisualizer.width / (window.devicePixelRatio || 1);
-    const height = popupVisualizer.height / (window.devicePixelRatio || 1);
-    vizCtx.clearRect(0, 0, width, height);
+    vizCtx.clearRect(0, 0, popupVisualizer.width, popupVisualizer.height);
   }
 
-  syncUI();
+  scheduleSyncUI();
 }
 
 // ─── Error Helpers ─────────────────────────────────────────────────────────
@@ -744,13 +752,18 @@ function disableControls() {
   modeBtns.forEach(b => b.disabled = true);
 }
 
-// ─── Event Listeners ───────────────────────────────────────────────────────
+// ─── Event Listeners (Zero-Lag Throttled) ───────────────────────────────────
 
-// 1. Volume Slider (Live Drag)
+// 1. Slider: Live 60fps drag without blocking IPC or disk writes
 if (volumeSlider) {
   volumeSlider.addEventListener('input', (e) => {
     const pct = parseInt(e.target.value, 10);
-    setGain(pct / 100);
+    setGain(pct / 100, false); // false = don't block on disk write while dragging!
+  });
+
+  // When drag is released, immediately commit to storage
+  volumeSlider.addEventListener('change', () => {
+    scheduleSaveSettings(true);
   });
 }
 
@@ -758,16 +771,16 @@ if (volumeSlider) {
 presetBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const pct = parseInt(btn.dataset.value, 10);
-    setGain(pct / 100);
+    setGain(pct / 100, true);
   });
 });
 
-// 3. Sound Profile Buttons (Balanced, Bass Boost, Vocal Clear, Cinema 3D)
+// 3. Sound Profile Buttons
 modeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const mode = btn.dataset.mode;
     applyEqProfile(mode, true);
-    saveDomainSettings();
+    scheduleSaveSettings(true);
   });
 });
 
@@ -776,7 +789,10 @@ if (bassSlider) {
   bassSlider.addEventListener('input', (e) => {
     const db = parseInt(e.target.value, 10);
     applyBass(db);
-    saveDomainSettings();
+    scheduleSaveSettings(false);
+  });
+  bassSlider.addEventListener('change', () => {
+    scheduleSaveSettings(true);
   });
 }
 
@@ -785,14 +801,17 @@ if (panSlider) {
   panSlider.addEventListener('input', (e) => {
     const panVal = parseFloat(e.target.value);
     applyPan(panVal);
-    saveDomainSettings();
+    scheduleSaveSettings(false);
+  });
+  panSlider.addEventListener('change', () => {
+    scheduleSaveSettings(true);
   });
 }
 
 if (btnResetPan) {
   btnResetPan.addEventListener('click', () => {
     applyPan(0);
-    saveDomainSettings();
+    scheduleSaveSettings(true);
   });
 }
 
@@ -804,7 +823,7 @@ if (btnBoost) {
       await startCapture();
     } else {
       if (state.gain === 0) {
-        await setGain(1.0);
+        setGain(1.0, true);
       } else {
         await stopCapture(true);
       }
@@ -826,27 +845,41 @@ if (btnReset) {
   });
 }
 
-// 9. Settings Panel Toggle
-if (btnSettings && settingsPanel) {
-  btnSettings.addEventListener('click', () => {
-    settingsPanel.classList.toggle('hidden');
-    btnSettings.classList.toggle('active', !settingsPanel.classList.contains('hidden'));
+// 9. Light / Dark Theme Button Toggle
+if (btnTheme) {
+  btnTheme.addEventListener('click', () => {
+    toggleTheme();
   });
 }
 
-// 10. Background Message Listener (Keyboard shortcuts)
+// 10. Settings Drawer (Overlay — Never Expands Container)
+if (btnSettings && settingsPanel) {
+  btnSettings.addEventListener('click', () => {
+    settingsPanel.classList.remove('hidden');
+    btnSettings.classList.add('active');
+  });
+}
+
+if (btnCloseSettings && settingsPanel) {
+  btnCloseSettings.addEventListener('click', () => {
+    settingsPanel.classList.add('hidden');
+    if (btnSettings) btnSettings.classList.remove('active');
+  });
+}
+
+// 11. Background Message Listener (Keyboard shortcuts)
 if (isExtensionContext && chrome?.runtime?.onMessage?.addListener) {
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'GAIN_CHANGED' && message.tabId === state.tabId) {
       state.gain = message.gain;
       state.isMuted = message.muted;
       applyGain();
-      syncUI();
+      scheduleSyncUI();
     }
   });
 }
 
-// 11. Cleanup on Unload
+// 12. Cleanup on Unload
 window.addEventListener('beforeunload', () => {
   if (captureStream) {
     captureStream.getTracks().forEach(track => track.stop());
@@ -858,17 +891,29 @@ async function init() {
   try {
     setupVisualizer();
 
-    // Standalone preview fallback
+    // 1. Theme Detection: Saved preference -> system preference -> fallback dark
+    let initialTheme = 'dark';
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      initialTheme = 'light';
+    }
+    if (chrome?.storage?.local) {
+      const storedTheme = await chrome.storage.local.get('app_theme').catch(() => null);
+      if (storedTheme?.app_theme) {
+        initialTheme = storedTheme.app_theme;
+      }
+    }
+    applyTheme(initialTheme);
+
+    // 2. Standalone preview fallback
     if (!isExtensionContext) {
-      console.log('[VBP] Running in standalone preview mode.');
       state.domain = 'youtube.com';
       state.tabId = 999;
       if (domainText) domainText.textContent = state.domain;
-      syncUI();
+      scheduleSyncUI();
       return;
     }
 
-    // Query active tab in current window
+    // 3. Query active tab in current window
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) return showError('No active tab found.');
 
@@ -886,7 +931,7 @@ async function init() {
       }
       showError('Chrome Security: Audio capture is restricted on chrome:// system pages. Please open a website with sound (e.g. YouTube, Netflix, Spotify) to boost audio.');
       disableControls();
-      syncUI();
+      scheduleSyncUI();
       return;
     }
 
@@ -932,7 +977,7 @@ async function init() {
       }
     }
 
-    syncUI();
+    scheduleSyncUI();
 
   } catch (err) {
     console.error('[VBP Popup] Init error:', err);
