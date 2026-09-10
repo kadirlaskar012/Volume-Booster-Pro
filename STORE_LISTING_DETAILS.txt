@@ -136,9 +136,6 @@ PERMISSIONS JUSTIFICATION (Copy & paste into Chrome Developer Dashboard):
 4. offscreen:
 "Used to run a persistent Web Audio API AudioContext pipeline in an isolated offscreen document so that boosted audio playback continues without interruption when the user closes the extension popup or navigates the active tab."
 
-5. host_permissions (<all_urls>):
-"Required to allow audio amplification across all web domains where media or video content is played (e.g. YouTube, Netflix, Spotify, Prime Video, Vimeo, Twitch) upon user activation."
-
 DATA USAGE & PRIVACY DECLARATION:
 • Do you collect any personal data? NO
 • Do you sell or transfer user data? NO
@@ -182,7 +179,8 @@ Create a clean ZIP archive of the extension containing ONLY the production files
 Files to include:
   • manifest.json
   • background.js
-  • content.js
+  • offscreen.html
+  • offscreen.js
   • popup.html
   • popup.css
   • popup.js
@@ -195,8 +193,9 @@ Files to exclude:
   • promo_shot.html
   • generate_icons.py
   • STORE_LISTING_DETAILS.txt
+  • ROADMAP_FUTURE_FEATURES.md
 
-(You can run the provided PowerShell command to automatically build `Volume-Booster-Pro.zip`!)
+(You can run the provided PowerShell command to automatically build `Volume-Booster-Pro-v2.0.zip`!)
 
 STEP 2: OPEN CHROME DEVELOPER DASHBOARD
 1. Visit: https://chrome.google.com/webstore/devconsole/
