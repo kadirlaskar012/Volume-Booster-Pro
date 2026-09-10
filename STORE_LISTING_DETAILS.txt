@@ -16,8 +16,8 @@ SHORT TITLE (Optional, for compact UI):
 Volume Booster Pro
 
 SUMMARY / SHORT DESCRIPTION (Strict limit: 132 characters):
-Boost volume up to 600%, enhance sub-bass, and customize sound with 4 DSP equalizer profiles. Works on YouTube, Netflix & Spotify.
-[Length: 131 characters — APPROVED for Chrome Web Store]
+Boost browser audio up to 600%, enhance deep bass, and customize sound with audio presets and a built-in safety limiter.
+[Length: 120 characters — 100% Policy Compliant, Zero Brand Keywords]
 
 PRIMARY CATEGORY:
 Accessibility  (Alternative: Productivity or Entertainment)
@@ -33,11 +33,11 @@ Free
 2. STORE LISTING — DETAILED DESCRIPTION (COPY & PASTE READY)
 --------------------------------------------------------------------------------
 
-Are quiet videos on YouTube, Netflix, or Spotify ruining your listening experience?
+Are quiet online videos, podcasts, or web streams ruining your listening experience?
 
 Volume Booster Pro is a lightweight, ultra-powerful Chrome extension that lets you amplify browser audio up to 600% (6× baseline volume) with crystal-clear fidelity. Powered by the native Web Audio API, Volume Booster Pro transforms your laptop speakers or headphones into a high-grade audio powerhouse.
 
-From quiet speech in Zoom meetings and podcasts to thumping EDM tracks and immersive movies, Volume Booster Pro gives you complete mastery over your sound.
+From quiet speech in web meetings and podcasts to energetic music tracks and immersive movies, Volume Booster Pro gives you complete mastery over your sound.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✨ KEY FEATURES & HIGHLIGHTS
@@ -54,7 +54,7 @@ From quiet speech in Zoom meetings and podcasts to thumping EDM tracks and immer
 
 🎵 4 TAILORED DSP SOUND PROFILES (EQ)
 • 🎧 Balanced: Studio-grade neutral acoustic tuning for everyday listening.
-• 🔊 Bass Boost: Punchy low-end punch engineered for EDM, Hip-Hop, and trap beats.
+• 🔊 Bass Boost: Punchy low-end punch engineered for electronic and bass-heavy genres.
 • 🗣️ Vocal Clear: Enhanced dialogue presence for podcasts, audiobooks, lectures, and calls.
 • 🎬 Cinema 3D: Wide spatial soundstage bringing movies, series, and games to life.
 
@@ -86,19 +86,19 @@ From quiet speech in Zoom meetings and podcasts to thumping EDM tracks and immer
 🚀 HOW TO USE IN 3 EASY STEPS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Open any website playing audio or video (YouTube, Netflix, Spotify, Prime Video, etc.).
+1. Open any web page playing audio or video content.
 2. Click the Volume Booster Pro icon in your Chrome toolbar.
 3. Drag the volume slider or select a quick preset (1.5×, 2×, 3×, 6×) to amplify your sound!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🌐 COMPATIBILITY
+🌐 UNIVERSAL COMPATIBILITY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Volume Booster Pro works across all major web platforms:
-• Video: YouTube, Netflix, Disney+, Prime Video, Twitch, Vimeo, Dailymotion
-• Music & Podcasts: Spotify, SoundCloud, Apple Music, Deezer, Tidal, TuneIn
-• Meetings & Calls: Google Meet, Zoom Web, Microsoft Teams, Discord Web
-• Social Media: TikTok, Instagram, Twitter/X, Facebook, Reddit
+Volume Booster Pro works seamlessly across all media-playing websites:
+• Online video streaming platforms and movie players
+• Web music players, radio stations, and podcast streams
+• Video conferencing and online collaboration tools
+• Social media feeds, live broadcasts, and web gaming
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ HEARING HEALTH & SAFETY ADVICE
@@ -108,11 +108,9 @@ Volume Booster Pro is exceptionally powerful. Prolonged exposure to extreme volu
 
 
 --------------------------------------------------------------------------------
-3. SEARCH KEYWORDS & SEO TAGS
+3. STORE LISTING COMPLIANCE NOTE
 --------------------------------------------------------------------------------
-
-Primary Keywords:
-volume booster, sound booster, audio booster, volume master, 600% volume, bass boost, bass booster, sound amplifier, audio amplifier, youtube volume booster, equalizer, sound profile, volume control, sound enhancer, tab volume booster, loud volume, audio equalizer, sound leveler, volume slider, chrome audio booster
+(Do NOT paste keyword lists into the description! Chrome Web Store policies strictly penalize keyword stuffing. All descriptions above are 100% compliant with the Web Store Spam Policy.)
 
 
 --------------------------------------------------------------------------------

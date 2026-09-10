@@ -742,7 +742,7 @@ async function init() {
         captureStatus.textContent = '○ Inactive';
         captureStatus.className = 'status-badge status-inactive';
       }
-      showError('Chrome Security: Audio capture is restricted on chrome:// system pages. Please open a media website (e.g. YouTube, Netflix, Spotify) to boost audio.');
+      showError('Chrome Security: Audio capture is restricted on internal system pages. Please open a media website playing audio to boost sound.');
       disableControls();
       scheduleSyncUI();
       return;
