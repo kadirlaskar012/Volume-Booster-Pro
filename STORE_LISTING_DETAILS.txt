@@ -136,6 +136,9 @@ PERMISSIONS JUSTIFICATION (Copy & paste into Chrome Developer Dashboard):
 4. scripting:
 "Used to inject lightweight helper scripts to coordinate media stream routing and handle playback state changes seamlessly."
 
+5. offscreen:
+"Used to run a persistent Web Audio API AudioContext pipeline in an isolated offscreen document so that boosted audio playback continues without interruption when the user closes the extension popup or navigates the active tab."
+
 DATA USAGE & PRIVACY DECLARATION:
 • Do you collect any personal data? NO
 • Do you sell or transfer user data? NO

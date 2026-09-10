@@ -1,13 +1,13 @@
 /**
- * popup.js — Volume Booster Pro (Ultra Edition — 60fps Butter Smooth)
+ * popup.js — Volume Booster Pro (Ultra Edition — Offscreen Persistent Audio)
  *
- * Architecture & Performance Optimization:
+ * Architecture:
  * ──────────────────────────────────────────────────────────────────────────
- * - Zero Disk/IPC Choke: Audio & UI updates run at 60fps via requestAnimationFrame;
- *   storage persistence and background badge messages are debounced.
- * - Smooth Web Audio DSP: Uses setTargetAtTime() for click-free exponential smoothing.
- * - Light/Dark Theme System: Persisted in chrome.storage.local, respects prefers-color-scheme.
- * - Fixed Frame: Never resizes or overflows outside 320px x 420px.
+ * - Audio graph runs in an isolated Offscreen Document (offscreen.html),
+ *   NOT inside the popup window.
+ * - When user clicks outside or closes popup, audio REMAINS BOOSTED!
+ * - Popup acts as a lightweight, 60fps remote control for the audio engine.
+ * - Supports instant 1-click presets, EQ profiles, Sub-bass, and theme toggle.
  */
 
 'use strict';
@@ -57,7 +57,7 @@ const popupVisualizer    = document.getElementById('popup-visualizer');
 const state = {
   gain: DEFAULT_GAIN,     // 0.0 to 6.0
   isMuted: false,         // boolean
-  isCapturing: false,     // boolean
+  isCapturing: false,     // boolean: true when tab is amplified via offscreen
   domain: '',             // active hostname
   tabId: null,            // active tab id
   bass: 0,                // Sub-bass boost: 0 to 15 dB
@@ -74,30 +74,17 @@ const EQ_PRESETS = {
   cinema:   { bassAdd: 4, midGain: 1, highGain: 4, label: 'Cinema 3D', color: '#EC4899' }
 };
 
-// ─── Web Audio API Hardware Node References ────────────────────────────────
-let audioCtx       = null;
-let sourceNode     = null;
-let bassFilter     = null;  // BiquadFilter: lowshelf @ 140Hz
-let eqMidFilter    = null;  // BiquadFilter: peaking @ 2.5kHz
-let eqHighFilter   = null;  // BiquadFilter: highshelf @ 8.0kHz
-let panNode        = null;  // StereoPannerNode (-1 to +1)
-let gainNode       = null;  // GainNode
-let destNode       = null;  // MediaStreamDestinationNode
-let analyserNode   = null;  // AnalyserNode (fftSize 64)
-let audioElement   = null;  // Output playback element
-let captureStream  = null;  // MediaStream from tabCapture
-let vizCtx         = null;  // Canvas 2D context
-let vizAnimId      = null;  // requestAnimationFrame ID
-let previewSynth   = null;  // For standalone preview mode
-let cachedFreqData = null;  // Reused Uint8Array for visualizer
+// ─── Visualizer & Simulation References ────────────────────────────────────
+let vizCtx         = null;
+let vizAnimId      = null;
+let vizPollTimer   = null;
+let cachedFreqData = null;
+let previewSynth   = null; // Only used in standalone non-extension preview.html
 
-// ─── Debouncing & RAF Optimization Variables ───────────────────────────────
+// ─── Debouncing & RAF Optimization ─────────────────────────────────────────
 let rafSyncId      = null;
 let saveDebounceId = null;
 
-/**
- * Schedule UI update on next animation frame to prevent layout thrashing
- */
 function scheduleSyncUI() {
   if (rafSyncId) return;
   rafSyncId = requestAnimationFrame(() => {
@@ -106,30 +93,24 @@ function scheduleSyncUI() {
   });
 }
 
-/**
- * Debounce disk storage and IPC badge updates so slider moves at 60fps smoothly
- */
 function scheduleSaveSettings(immediate = false) {
   if (saveDebounceId) clearTimeout(saveDebounceId);
   if (immediate) {
-    saveDomainSettings();
-    sendGainToBackground();
+    sendStateToBackground('SET_GAIN', { gain: state.gain });
   } else {
     saveDebounceId = setTimeout(() => {
-      saveDomainSettings();
-      sendGainToBackground();
-    }, 200);
+      sendStateToBackground('SET_GAIN', { gain: state.gain });
+    }, 150);
   }
 }
 
-function sendGainToBackground() {
-  if (isExtensionContext && state.tabId) {
-    chrome.runtime.sendMessage({
-      type: 'SET_GAIN',
-      tabId: state.tabId,
-      gain: state.gain
-    }).catch(() => {});
-  }
+async function sendStateToBackground(type, payload = {}) {
+  if (!isExtensionContext || !state.tabId) return;
+  return await chrome.runtime.sendMessage({
+    type,
+    tabId: state.tabId,
+    ...payload
+  }).catch(() => null);
 }
 
 // ─── Unified UI Synchronization ────────────────────────────────────────────
@@ -138,11 +119,11 @@ function syncUI() {
   const actualPct = Math.round(state.gain * 100);
   const effectivePct = Math.round(effectiveGain * 100);
 
-  // 1. Slider value and dynamic gradient track (High Contrast)
+  // 1. Slider value and dynamic gradient track
   if (volumeSlider) {
     volumeSlider.value = actualPct;
     const fillPercentage = (actualPct / 600) * 100;
-    const fillStop = actualPct >= 300 ? '#6366F1' : '#38BDF8';
+    const fillStop = actualPct >= 400 ? '#F59E0B' : (actualPct >= 150 ? '#6366F1' : '#38BDF8');
     volumeSlider.style.background = `linear-gradient(to right, ${fillStop} ${fillPercentage}%, var(--slider-track) ${fillPercentage}%)`;
   }
 
@@ -150,26 +131,28 @@ function syncUI() {
   if (volumeDisplay) {
     if (state.isMuted) {
       volumeDisplay.textContent = 'MUTED';
-      volumeDisplay.className = 'volume-number tier-muted';
       if (gainSubtext) gainSubtext.textContent = `${actualPct}% (sound muted)`;
+      volumeDisplay.className = 'volume-number tier-muted';
       if (volumeHint) {
         volumeHint.textContent = 'Click mute button to unmute';
         volumeHint.classList.remove('hidden');
       }
     } else if (effectivePct === 0) {
       volumeDisplay.textContent = '0%';
-      volumeDisplay.className = 'volume-number tier-idle';
       if (gainSubtext) gainSubtext.textContent = '0.00× (Silenced)';
+      volumeDisplay.className = 'volume-number tier-idle';
       if (volumeHint) {
         volumeHint.textContent = 'Drag slider to amplify audio';
         volumeHint.classList.remove('hidden');
       }
     } else {
       volumeDisplay.textContent = `${effectivePct}%`;
-      if (effectivePct === 100) {
-        gainSubtext.textContent = '1.00× (Baseline)';
-      } else {
-        gainSubtext.textContent = `${effectiveGain.toFixed(2)}× gain`;
+      if (gainSubtext) {
+        if (effectivePct === 100) {
+          gainSubtext.textContent = '1.00× (Baseline)';
+        } else {
+          gainSubtext.textContent = `${state.gain.toFixed(2)}× gain`;
+        }
       }
       if (volumeHint) volumeHint.classList.add('hidden');
 
@@ -183,7 +166,7 @@ function syncUI() {
     }
   }
 
-  // 3. Dynamic Glow Orb based on Volume Boost Level
+  // 3. Dynamic Glow Orb
   if (glowOrb) {
     if (state.isMuted || effectivePct === 0) {
       glowOrb.style.background = 'radial-gradient(ellipse at 50% 0%, rgba(100, 116, 139, 0.12) 0%, transparent 70%)';
@@ -248,7 +231,7 @@ function syncUI() {
   if (captureStatus) {
     captureStatus.classList.remove('hidden', 'status-active', 'status-inactive');
     if (state.isCapturing) {
-      captureStatus.textContent = '● Enabled';
+      captureStatus.textContent = '● Active';
       captureStatus.classList.add('status-active');
     } else {
       captureStatus.textContent = '○ Inactive';
@@ -256,79 +239,19 @@ function syncUI() {
     }
   }
 
-  // 9. Sub-Bass Slider & Value Pill
+  // 9. Sub-Bass & EQ Profiles
   if (bassSlider) bassSlider.value = state.bass;
   if (bassDbText) bassDbText.textContent = `+${state.bass} dB`;
+  if (panSlider) panSlider.value = state.pan;
 
-  // 10. Sound Profile Buttons
   modeBtns.forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === state.eqMode);
   });
+
   const currentPreset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
   if (activeProfileName) {
     activeProfileName.textContent = currentPreset.label;
     activeProfileName.style.color = currentPreset.color;
-  }
-
-  // 11. Stereo Pan Slider
-  if (panSlider) panSlider.value = state.pan;
-}
-
-// ─── Web Audio API Parameter Application (Click-free setTargetAtTime) ───────
-function applyGain() {
-  if (!gainNode || !audioCtx) return;
-  const factor = isExtensionContext ? 1.0 : 0.12;
-  const effectiveGain = state.isMuted ? 0 : state.gain * factor;
-
-  // W3C recommended smooth parameter transition without audio-thread clicks
-  gainNode.gain.setTargetAtTime(effectiveGain, audioCtx.currentTime, 0.015);
-}
-
-function applyEqProfile(mode, smooth = true) {
-  state.eqMode = mode;
-  const preset = EQ_PRESETS[mode] || EQ_PRESETS.balanced;
-
-  if (activeProfileName) {
-    activeProfileName.textContent = preset.label;
-    activeProfileName.style.color = preset.color;
-  }
-
-  modeBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mode === mode);
-  });
-
-  if (!audioCtx) return;
-  const timeConst = smooth ? 0.03 : 0.001;
-
-  const targetBass = Math.min(18, Math.max(0, state.bass + preset.bassAdd));
-  if (bassFilter) {
-    bassFilter.gain.setTargetAtTime(targetBass, audioCtx.currentTime, timeConst);
-  }
-  if (eqMidFilter) {
-    eqMidFilter.gain.setTargetAtTime(preset.midGain, audioCtx.currentTime, timeConst);
-  }
-  if (eqHighFilter) {
-    eqHighFilter.gain.setTargetAtTime(preset.highGain, audioCtx.currentTime, timeConst);
-  }
-}
-
-function applyBass(bassValue) {
-  state.bass = Math.min(15, Math.max(0, bassValue));
-  if (bassDbText) bassDbText.textContent = `+${state.bass} dB`;
-
-  if (bassFilter && audioCtx) {
-    const preset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
-    const targetBass = Math.min(18, Math.max(0, state.bass + preset.bassAdd));
-    bassFilter.gain.setTargetAtTime(targetBass, audioCtx.currentTime, 0.015);
-  }
-}
-
-function applyPan(panValue) {
-  state.pan = Math.min(1.0, Math.max(-1.0, panValue));
-  if (panSlider) panSlider.value = state.pan;
-
-  if (panNode && audioCtx) {
-    panNode.pan.setTargetAtTime(state.pan, audioCtx.currentTime, 0.015);
   }
 }
 
@@ -359,41 +282,50 @@ function toggleTheme() {
   applyTheme(newTheme);
 }
 
-// ─── Persistence Helper ────────────────────────────────────────────────────
-async function saveDomainSettings() {
-  if (!isExtensionContext || !state.domain || !chrome?.storage?.local) return;
-  const key = `vol_${state.domain}`;
-  const data = {
-    gain: state.gain,
-    bass: state.bass,
-    eqMode: state.eqMode,
-    pan: state.pan
-  };
-  await chrome.storage.local.set({ [key]: data }).catch(() => {});
-}
-
 // ─── State Mutation Handlers ───────────────────────────────────────────────
-function setGain(newGain, immediateSave = false) {
+async function setGain(newGain, immediateSave = false) {
   state.gain = Math.min(MAX_GAIN, Math.max(MIN_GAIN, newGain));
   state.isMuted = false;
 
-  applyGain();
   scheduleSyncUI();
-  scheduleSaveSettings(immediateSave);
+
+  // If not capturing yet and user boosts above 100%, automatically start capture!
+  if (!state.isCapturing && state.gain > 1.0) {
+    await startCapture();
+  } else {
+    scheduleSaveSettings(immediateSave);
+  }
+}
+
+async function applyEqProfile(mode, notify = true) {
+  state.eqMode = mode;
+  scheduleSyncUI();
+  if (notify && isExtensionContext) {
+    await sendStateToBackground('SET_EQ_PROFILE', { eqMode: mode });
+  }
+}
+
+async function applyBass(bassValue, notify = true) {
+  state.bass = Math.min(15, Math.max(0, bassValue));
+  if (bassDbText) bassDbText.textContent = `+${state.bass} dB`;
+  if (notify && isExtensionContext) {
+    await sendStateToBackground('SET_BASS', { bass: state.bass });
+  }
+}
+
+async function applyPan(panValue, notify = true) {
+  state.pan = Math.min(1.0, Math.max(-1.0, panValue));
+  if (panSlider) panSlider.value = state.pan;
+  if (notify && isExtensionContext) {
+    await sendStateToBackground('SET_PAN', { pan: state.pan });
+  }
 }
 
 async function toggleMute() {
   state.isMuted = !state.isMuted;
-
-  applyGain();
   scheduleSyncUI();
-
-  if (isExtensionContext && state.tabId) {
-    await chrome.runtime.sendMessage({
-      type: 'SET_MUTED',
-      tabId: state.tabId,
-      muted: state.isMuted
-    }).catch(() => {});
+  if (isExtensionContext) {
+    await sendStateToBackground('SET_MUTED', { muted: state.isMuted });
   }
 }
 
@@ -404,28 +336,20 @@ async function resetVolume() {
   state.eqMode = 'balanced';
   state.pan = 0;
 
-  applyGain();
-  applyEqProfile('balanced');
-  applyBass(0);
-  applyPan(0);
   scheduleSyncUI();
   hideError();
-  scheduleSaveSettings(true);
 
-  if (isExtensionContext && state.tabId) {
-    await chrome.runtime.sendMessage({
-      type: 'RESET',
-      tabId: state.tabId
-    }).catch(() => {});
+  if (isExtensionContext) {
+    await sendStateToBackground('RESET');
   }
 }
 
-// ─── Live Popup Spectrum Visualizer Canvas (Lightweight & Smooth) ──────────
+// ─── Live Popup Mini Spectrum Visualizer ───────────────────────────────────
 function setupVisualizer() {
   if (!popupVisualizer) return;
   const dpr = window.devicePixelRatio || 1;
-  const rectWidth = 280; // Fixed canvas logical width
-  const rectHeight = 16; // Fixed canvas logical height
+  const rectWidth = 280;
+  const rectHeight = 16;
   popupVisualizer.width = rectWidth * dpr;
   popupVisualizer.height = rectHeight * dpr;
   vizCtx = popupVisualizer.getContext('2d');
@@ -433,8 +357,27 @@ function setupVisualizer() {
 }
 
 function startVisualizer() {
-  if (vizAnimId) cancelAnimationFrame(vizAnimId);
   setupVisualizer();
+
+  // Poll offscreen document for FFT audio data while popup is open
+  if (isExtensionContext) {
+    if (vizPollTimer) clearInterval(vizPollTimer);
+    vizPollTimer = setInterval(async () => {
+      if (!state.isCapturing || state.isMuted) return;
+      try {
+        const res = await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'GET_METRICS',
+          tabId: state.tabId
+        });
+        if (res?.data && res.data.length > 0) {
+          cachedFreqData = new Uint8Array(res.data);
+        }
+      } catch {}
+    }, 60);
+  }
+
+  if (vizAnimId) cancelAnimationFrame(vizAnimId);
   drawPopupVisualizer();
 }
 
@@ -451,41 +394,32 @@ function drawPopupVisualizer() {
   const barGap = 3;
   const barWidth = (width - (numBars - 1) * barGap) / numBars;
 
-  let hasAudio = false;
-  if (analyserNode && state.isCapturing && !state.isMuted) {
-    if (!cachedFreqData || cachedFreqData.length !== analyserNode.frequencyBinCount) {
-      cachedFreqData = new Uint8Array(analyserNode.frequencyBinCount);
-    }
-    analyserNode.getByteFrequencyData(cachedFreqData);
-    hasAudio = true;
-  }
-
   const effectiveGain = state.isMuted ? 0 : state.gain;
   const actualPct = Math.round(effectiveGain * 100);
 
-  // Dynamic bar colors based on boost tier
   let gradColor1 = '#06B6D4';
-  let gradColor2 = '#38BDF8';
   if (actualPct >= 400) {
     gradColor1 = '#F59E0B';
-    gradColor2 = '#EF4444';
   } else if (actualPct > 150) {
     gradColor1 = '#8B5CF6';
-    gradColor2 = '#C084FC';
   }
 
-  for (let i = 0; i < numBars; i++) {
-    let barHeight = 2; // Baseline dot
+  const hasAudioData = cachedFreqData && cachedFreqData.length > 0;
 
-    if (hasAudio && cachedFreqData) {
-      const binIdx = Math.min(cachedFreqData.length - 1, Math.floor(i * (cachedFreqData.length / numBars)));
-      const rawAmp = cachedFreqData[binIdx] / 255;
-      const boostMultiplier = 0.5 + 0.5 * (effectiveGain / 6.0);
-      barHeight = Math.max(2, rawAmp * (height - 2) * boostMultiplier);
-    } else if (state.isCapturing && !state.isMuted) {
-      // Gentle idle wave
-      const time = Date.now() * 0.003;
-      barHeight = 2 + Math.sin(time + i * 0.4) * 1.5;
+  for (let i = 0; i < numBars; i++) {
+    let barHeight = 2;
+
+    if (state.isCapturing && !state.isMuted) {
+      if (hasAudioData) {
+        const binIdx = Math.min(cachedFreqData.length - 1, Math.floor(i * (cachedFreqData.length / numBars)));
+        const rawAmp = cachedFreqData[binIdx] / 255;
+        const boostMultiplier = 0.5 + 0.5 * (effectiveGain / 6.0);
+        barHeight = Math.max(2, rawAmp * (height - 2) * boostMultiplier);
+      } else {
+        // Idle ambient wave while boosting
+        const time = Date.now() * 0.003;
+        barHeight = 2 + Math.sin(time + i * 0.4) * 1.5;
+      }
     }
 
     const x = i * (barWidth + barGap);
@@ -496,7 +430,7 @@ function drawPopupVisualizer() {
   }
 }
 
-// ─── Start Tab Audio Capture ───────────────────────────────────────────────
+// ─── Start Tab Audio Capture (Offscreen Architecture) ──────────────────────
 async function startCapture() {
   if (state.isCapturing) return;
 
@@ -505,158 +439,43 @@ async function startCapture() {
   hideError();
 
   try {
-    // ── Standalone Browser Demo (Preview Mode) ──
+    // ── Standalone Preview Fallback (Non-extension testbench) ──
     if (!isExtensionContext) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-      }
-
-      const osc = audioCtx.createOscillator();
-      const lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(329.63, audioCtx.currentTime);
-      lfo.frequency.setValueAtTime(3.5, audioCtx.currentTime);
-      lfoGain.gain.setValueAtTime(10, audioCtx.currentTime);
-      lfo.connect(osc.frequency);
-
-      bassFilter = audioCtx.createBiquadFilter();
-      bassFilter.type = 'lowshelf';
-      bassFilter.frequency.setValueAtTime(140, audioCtx.currentTime);
-      bassFilter.gain.setValueAtTime(state.bass, audioCtx.currentTime);
-
-      eqMidFilter = audioCtx.createBiquadFilter();
-      eqMidFilter.type = 'peaking';
-      eqMidFilter.frequency.setValueAtTime(2500, audioCtx.currentTime);
-
-      eqHighFilter = audioCtx.createBiquadFilter();
-      eqHighFilter.type = 'highshelf';
-      eqHighFilter.frequency.setValueAtTime(8000, audioCtx.currentTime);
-
-      if (audioCtx.createStereoPanner) {
-        panNode = audioCtx.createStereoPanner();
-        panNode.pan.setValueAtTime(state.pan, audioCtx.currentTime);
-      }
-
-      gainNode = audioCtx.createGain();
-      gainNode.gain.value = (state.isMuted ? 0 : state.gain) * 0.12;
-
-      analyserNode = audioCtx.createAnalyser();
-      analyserNode.fftSize = 64;
-
-      osc.connect(bassFilter);
-      bassFilter.connect(eqMidFilter);
-      eqMidFilter.connect(eqHighFilter);
-
-      let chainEnd = eqHighFilter;
-      if (panNode) {
-        chainEnd.connect(panNode);
-        chainEnd = panNode;
-      }
-      chainEnd.connect(gainNode);
-      gainNode.connect(analyserNode);
-      gainNode.connect(audioCtx.destination);
-
-      lfo.start();
-      osc.start();
-      previewSynth = { osc, lfo };
-
       state.isCapturing = true;
       if (btnBoost) btnBoost.disabled = false;
-      applyEqProfile(state.eqMode, false);
       startVisualizer();
       scheduleSyncUI();
       return;
     }
 
-    // ── Real Chrome Extension Tab Capture ──
-    captureStream = await new Promise((resolve, reject) => {
-      chrome.tabCapture.capture(
-        { audio: true, video: false },
-        (stream) => {
+    // ── Real Chrome Extension: Obtain streamId via user gesture ──
+    let streamId = null;
+    if (chrome.tabCapture && typeof chrome.tabCapture.getMediaStreamId === 'function') {
+      streamId = await new Promise((resolve, reject) => {
+        chrome.tabCapture.getMediaStreamId({ targetTabId: state.tabId }, (id) => {
           if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
-            return;
+            return reject(new Error(chrome.runtime.lastError.message));
           }
-          if (!stream) {
-            reject(new Error('tabCapture returned null stream. The tab may not have audio, or capture is already active.'));
-            return;
-          }
-          resolve(stream);
-        }
-      );
+          resolve(id);
+        });
+      }).catch(() => null);
+    }
+
+    // Instruct background service worker & offscreen document to start capture
+    const response = await chrome.runtime.sendMessage({
+      type: 'START_CAPTURE',
+      tabId: state.tabId,
+      streamId: streamId
     });
 
-    audioCtx = new AudioContext({ sampleRate: 48000 });
-    if (audioCtx.state === 'suspended') {
-      await audioCtx.resume();
+    if (response?.error) {
+      throw new Error(response.error);
     }
-
-    sourceNode = audioCtx.createMediaStreamSource(captureStream);
-
-    bassFilter = audioCtx.createBiquadFilter();
-    bassFilter.type = 'lowshelf';
-    bassFilter.frequency.setValueAtTime(140, audioCtx.currentTime);
-    bassFilter.gain.setValueAtTime(state.bass, audioCtx.currentTime);
-
-    eqMidFilter = audioCtx.createBiquadFilter();
-    eqMidFilter.type = 'peaking';
-    eqMidFilter.frequency.setValueAtTime(2500, audioCtx.currentTime);
-    eqMidFilter.Q.setValueAtTime(1.0, audioCtx.currentTime);
-
-    eqHighFilter = audioCtx.createBiquadFilter();
-    eqHighFilter.type = 'highshelf';
-    eqHighFilter.frequency.setValueAtTime(8000, audioCtx.currentTime);
-
-    if (audioCtx.createStereoPanner) {
-      panNode = audioCtx.createStereoPanner();
-      panNode.pan.setValueAtTime(state.pan, audioCtx.currentTime);
-    }
-
-    gainNode = audioCtx.createGain();
-    gainNode.gain.setValueAtTime(state.isMuted ? 0 : state.gain, audioCtx.currentTime);
-
-    destNode = audioCtx.createMediaStreamDestination();
-
-    analyserNode = audioCtx.createAnalyser();
-    analyserNode.fftSize = 64;
-    analyserNode.smoothingTimeConstant = 0.8;
-
-    let lastNode = sourceNode;
-    lastNode.connect(bassFilter);
-    lastNode = bassFilter;
-    lastNode.connect(eqMidFilter);
-    lastNode = eqMidFilter;
-    lastNode.connect(eqHighFilter);
-    lastNode = eqHighFilter;
-
-    if (panNode) {
-      lastNode.connect(panNode);
-      lastNode = panNode;
-    }
-    lastNode.connect(gainNode);
-
-    gainNode.connect(destNode);
-    gainNode.connect(analyserNode);
-
-    audioElement = new Audio();
-    audioElement.srcObject = destNode.stream;
-    audioElement.volume = 1.0;
-    await audioElement.play();
-
-    captureStream.getAudioTracks()[0].addEventListener('ended', () => {
-      stopCapture(false);
-    });
 
     state.isCapturing = true;
     if (btnBoost) btnBoost.disabled = false;
 
-    applyEqProfile(state.eqMode, false);
     startVisualizer();
-
-    await chrome.runtime.sendMessage({ type: 'START_CAPTURE', tabId: state.tabId }).catch(() => {});
     scheduleSyncUI();
 
   } catch (err) {
@@ -665,68 +484,34 @@ async function startCapture() {
     if (btnBoost) btnBoost.disabled = false;
     scheduleSyncUI();
 
-    let friendlyMsg = err.message;
-    if (err.message.includes('already active') || err.message.includes('already captured')) {
-      friendlyMsg = 'This tab audio is already being captured. Click "Enable Boost" again to reconnect, or reload the tab.';
-    } else if (err.message.includes('permission')) {
+    let friendlyMsg = err.message || 'Could not capture tab audio.';
+    if (friendlyMsg.includes('already active') || friendlyMsg.includes('already captured')) {
+      friendlyMsg = 'Audio capture is already active on this tab. Boost is enabled!';
+      state.isCapturing = true;
+      startVisualizer();
+      scheduleSyncUI();
+      return;
+    } else if (friendlyMsg.includes('permission')) {
       friendlyMsg = 'Permission denied. Please verify extension permissions in chrome://extensions.';
-    } else if (err.message.includes('null stream')) {
-      friendlyMsg = 'Could not capture audio. Play audio on the page first, then click Enable Boost.';
     }
     showError(friendlyMsg);
   }
 }
 
 // ─── Stop Tab Audio Capture ────────────────────────────────────────────────
-async function stopCapture(userInitiated = true) {
-  if (vizAnimId) {
-    cancelAnimationFrame(vizAnimId);
-    vizAnimId = null;
-  }
-
-  if (previewSynth) {
-    try {
-      previewSynth.osc.stop();
-      previewSynth.lfo.stop();
-      previewSynth.osc.disconnect();
-      previewSynth.lfo.disconnect();
-    } catch {}
-    previewSynth = null;
-  }
-
-  if (audioElement) {
-    audioElement.pause();
-    audioElement.srcObject = null;
-    audioElement = null;
-  }
-
-  if (sourceNode)   { try { sourceNode.disconnect();   } catch {} sourceNode   = null; }
-  if (bassFilter)   { try { bassFilter.disconnect();   } catch {} bassFilter   = null; }
-  if (eqMidFilter)  { try { eqMidFilter.disconnect();  } catch {} eqMidFilter  = null; }
-  if (eqHighFilter) { try { eqHighFilter.disconnect(); } catch {} eqHighFilter = null; }
-  if (panNode)      { try { panNode.disconnect();      } catch {} panNode      = null; }
-  if (gainNode)     { try { gainNode.disconnect();     } catch {} gainNode     = null; }
-  if (destNode)     { try { destNode.disconnect();     } catch {} destNode     = null; }
-  if (analyserNode) { try { analyserNode.disconnect(); } catch {} analyserNode = null; }
-
-  if (captureStream) {
-    captureStream.getTracks().forEach(track => track.stop());
-    captureStream = null;
-  }
-
-  if (audioCtx) {
-    try { await audioCtx.close(); } catch {}
-    audioCtx = null;
-  }
-
+async function stopCapture() {
   state.isCapturing = false;
-
-  if (userInitiated && isExtensionContext && state.tabId) {
-    await chrome.runtime.sendMessage({ type: 'STOP_CAPTURE', tabId: state.tabId }).catch(() => {});
+  if (vizPollTimer) {
+    clearInterval(vizPollTimer);
+    vizPollTimer = null;
   }
+  cachedFreqData = null;
 
-  if (popupVisualizer && vizCtx) {
-    vizCtx.clearRect(0, 0, popupVisualizer.width, popupVisualizer.height);
+  if (isExtensionContext && state.tabId) {
+    await chrome.runtime.sendMessage({
+      type: 'STOP_CAPTURE',
+      tabId: state.tabId
+    }).catch(() => {});
   }
 
   scheduleSyncUI();
@@ -752,16 +537,15 @@ function disableControls() {
   modeBtns.forEach(b => b.disabled = true);
 }
 
-// ─── Event Listeners (Zero-Lag Throttled) ───────────────────────────────────
+// ─── Event Listeners ───────────────────────────────────────────────────────
 
-// 1. Slider: Live 60fps drag without blocking IPC or disk writes
+// 1. Slider: Live 60fps drag with debounced storage write
 if (volumeSlider) {
   volumeSlider.addEventListener('input', (e) => {
     const pct = parseInt(e.target.value, 10);
-    setGain(pct / 100, false); // false = don't block on disk write while dragging!
+    setGain(pct / 100, false);
   });
 
-  // When drag is released, immediately commit to storage
   volumeSlider.addEventListener('change', () => {
     scheduleSaveSettings(true);
   });
@@ -780,7 +564,6 @@ modeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const mode = btn.dataset.mode;
     applyEqProfile(mode, true);
-    scheduleSaveSettings(true);
   });
 });
 
@@ -788,30 +571,26 @@ modeBtns.forEach(btn => {
 if (bassSlider) {
   bassSlider.addEventListener('input', (e) => {
     const db = parseInt(e.target.value, 10);
-    applyBass(db);
-    scheduleSaveSettings(false);
+    applyBass(db, false);
   });
   bassSlider.addEventListener('change', () => {
-    scheduleSaveSettings(true);
+    applyBass(parseInt(bassSlider.value, 10), true);
   });
 }
 
 // 5. Stereo Pan Slider & Reset
 if (panSlider) {
   panSlider.addEventListener('input', (e) => {
-    const panVal = parseFloat(e.target.value);
-    applyPan(panVal);
-    scheduleSaveSettings(false);
+    applyPan(parseFloat(e.target.value), false);
   });
   panSlider.addEventListener('change', () => {
-    scheduleSaveSettings(true);
+    applyPan(parseFloat(panSlider.value), true);
   });
 }
 
 if (btnResetPan) {
   btnResetPan.addEventListener('click', () => {
-    applyPan(0);
-    scheduleSaveSettings(true);
+    applyPan(0, true);
   });
 }
 
@@ -823,9 +602,9 @@ if (btnBoost) {
       await startCapture();
     } else {
       if (state.gain === 0) {
-        setGain(1.0, true);
+        await setGain(1.0, true);
       } else {
-        await stopCapture(true);
+        await stopCapture();
       }
     }
   });
@@ -852,7 +631,7 @@ if (btnTheme) {
   });
 }
 
-// 10. Settings Drawer (Overlay — Never Expands Container)
+// 10. Settings Drawer Toggle
 if (btnSettings && settingsPanel) {
   btnSettings.addEventListener('click', () => {
     settingsPanel.classList.remove('hidden');
@@ -867,23 +646,10 @@ if (btnCloseSettings && settingsPanel) {
   });
 }
 
-// 11. Background Message Listener (Keyboard shortcuts)
-if (isExtensionContext && chrome?.runtime?.onMessage?.addListener) {
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === 'GAIN_CHANGED' && message.tabId === state.tabId) {
-      state.gain = message.gain;
-      state.isMuted = message.muted;
-      applyGain();
-      scheduleSyncUI();
-    }
-  });
-}
-
-// 12. Cleanup on Unload
-window.addEventListener('beforeunload', () => {
-  if (captureStream) {
-    captureStream.getTracks().forEach(track => track.stop());
-  }
+// 11. Cleanup Popup UI on Unload (Audio in Offscreen Document REMAINS ALIVE!)
+window.addEventListener('unload', () => {
+  if (vizPollTimer) clearInterval(vizPollTimer);
+  if (vizAnimId) cancelAnimationFrame(vizAnimId);
 });
 
 // ─── Initialization ────────────────────────────────────────────────────────
@@ -891,7 +657,7 @@ async function init() {
   try {
     setupVisualizer();
 
-    // 1. Theme Detection: Saved preference -> system preference -> fallback dark
+    // 1. Theme Detection
     let initialTheme = 'dark';
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
       initialTheme = 'light';
@@ -909,6 +675,7 @@ async function init() {
       state.domain = 'youtube.com';
       state.tabId = 999;
       if (domainText) domainText.textContent = state.domain;
+      startVisualizer();
       scheduleSyncUI();
       return;
     }
@@ -929,7 +696,7 @@ async function init() {
         captureStatus.textContent = '○ Inactive';
         captureStatus.className = 'status-badge status-inactive';
       }
-      showError('Chrome Security: Audio capture is restricted on chrome:// system pages. Please open a website with sound (e.g. YouTube, Netflix, Spotify) to boost audio.');
+      showError('Chrome Security: Audio capture is restricted on chrome:// system pages. Please open a media website (e.g. YouTube, Netflix, Spotify) to boost audio.');
       disableControls();
       scheduleSyncUI();
       return;
@@ -952,31 +719,22 @@ async function init() {
       if (faviconFallback) faviconFallback.classList.add('hidden');
     }
 
-    // Retrieve state from background worker
-    const response = await chrome.runtime.sendMessage({ type: 'GET_STATE', tabId: state.tabId }).catch(() => null);
+    // Retrieve state from background worker (Offscreen Coordinator)
+    const response = await chrome.runtime.sendMessage({
+      type: 'GET_STATE',
+      tabId: state.tabId
+    }).catch(() => null);
+
     if (response?.state) {
       state.gain = response.state.gain ?? DEFAULT_GAIN;
+      state.bass = response.state.bass ?? 0;
+      state.eqMode = response.state.eqMode ?? 'balanced';
+      state.pan = response.state.pan ?? 0;
       state.isMuted = response.state.muted ?? false;
       state.isCapturing = response.state.capturing ?? false;
     }
 
-    // Retrieve saved domain settings from storage
-    if (chrome.storage?.local) {
-      const storageKey = `vol_${state.domain}`;
-      const stored = await chrome.storage.local.get(storageKey);
-      if (stored && stored[storageKey] !== undefined) {
-        const val = stored[storageKey];
-        if (typeof val === 'number') {
-          state.gain = val;
-        } else if (typeof val === 'object' && val !== null) {
-          state.gain = val.gain ?? DEFAULT_GAIN;
-          state.bass = val.bass ?? 0;
-          state.eqMode = val.eqMode ?? 'balanced';
-          state.pan = val.pan ?? 0;
-        }
-      }
-    }
-
+    startVisualizer();
     scheduleSyncUI();
 
   } catch (err) {
