@@ -144,7 +144,13 @@
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
           Sound Profile (EQ)
         </span>
-        <span id="active-profile-name" class="profile-pill">Balanced</span>
+        <div class="eq-header-right">
+          <span id="active-profile-name" class="profile-pill bypassed">BYPASS</span>
+          <button id="btn-eq-toggle" class="eq-toggle-btn eq-off" title="Toggle Equalizer On/Off" aria-label="Toggle Equalizer">
+            <span class="eq-toggle-knob"></span>
+            <span id="eq-toggle-label" class="eq-toggle-label">OFF</span>
+          </button>
+        </div>
       </div>
       <div class="modes-grid">
         <button class="mode-btn active" data-mode="balanced">

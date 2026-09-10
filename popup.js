@@ -47,6 +47,10 @@ const settingsPanel      = document.getElementById('settings-panel');
 const presetBtns         = document.querySelectorAll('.preset-btn');
 const modeBtns           = document.querySelectorAll('.mode-btn');
 const activeProfileName  = document.getElementById('active-profile-name');
+const btnEqToggle        = document.getElementById('btn-eq-toggle');
+const eqToggleLabel      = document.getElementById('eq-toggle-label');
+const modesGrid          = document.querySelector('.modes-grid');
+const bassControlWrapper = document.querySelector('.bass-control-wrapper');
 const bassSlider         = document.getElementById('bass-slider');
 const bassDbText         = document.getElementById('bass-db-text');
 const panSlider          = document.getElementById('pan-slider');
@@ -62,16 +66,17 @@ const state = {
   tabId: null,            // active tab id
   bass: 0,                // Sub-bass boost: 0 to 15 dB
   eqMode: 'balanced',     // 'balanced' | 'bass' | 'vocal' | 'cinema'
+  eqEnabled: false,       // boolean: EQ is bypassed/off by default
   pan: 0,                 // Stereo pan: -1.0 to +1.0
   theme: 'dark'           // 'dark' | 'light'
 };
 
-// ─── Sound Profile EQ Definitions ──────────────────────────────────────────
+// ─── Sound Profile EQ Definitions (Fine-Tuned Studio Parameters) ───────────
 const EQ_PRESETS = {
-  balanced: { bassAdd: 0, midGain: 0, highGain: 0, label: 'Balanced', color: '#38BDF8' },
-  bass:     { bassAdd: 6, midGain: -1, highGain: 1, label: 'Bass Boost', color: '#8B5CF6' },
-  vocal:    { bassAdd: -2, midGain: 5, highGain: 2, label: 'Vocal Clear', color: '#10B981' },
-  cinema:   { bassAdd: 4, midGain: 1, highGain: 4, label: 'Cinema 3D', color: '#EC4899' }
+  balanced: { bassAdd: 0,    midGain: 0,    highGain: 0,   label: 'Balanced',   color: '#38BDF8' },
+  bass:     { bassAdd: 4.5,  midGain: -1.0, highGain: 1.0, label: 'Bass Boost', color: '#8B5CF6' },
+  vocal:    { bassAdd: -1.5, midGain: 2.5,  highGain: 1.5, label: 'Vocal Clear', color: '#10B981' },
+  cinema:   { bassAdd: 3.0,  midGain: -1.0, highGain: 2.5, label: 'Cinema 3D',  color: '#EC4899' }
 };
 
 // ─── Visualizer & Simulation References ────────────────────────────────────
@@ -238,14 +243,41 @@ function syncUI() {
   if (bassDbText) bassDbText.textContent = `+${state.bass} dB`;
   if (panSlider) panSlider.value = state.pan;
 
+  // EQ ON/OFF Button & Container State
+  if (btnEqToggle && eqToggleLabel) {
+    if (state.eqEnabled) {
+      btnEqToggle.className = 'eq-toggle-btn eq-on';
+      btnEqToggle.title = 'Equalizer Active — Click to Bypass';
+      eqToggleLabel.textContent = 'ON';
+    } else {
+      btnEqToggle.className = 'eq-toggle-btn eq-off';
+      btnEqToggle.title = 'Equalizer Bypassed — Click to Enable';
+      eqToggleLabel.textContent = 'OFF';
+    }
+  }
+
+  if (modesGrid) {
+    modesGrid.classList.toggle('disabled', !state.eqEnabled);
+  }
+  if (bassControlWrapper) {
+    bassControlWrapper.classList.toggle('disabled', !state.eqEnabled);
+  }
+
   modeBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mode === state.eqMode);
+    btn.classList.toggle('active', btn.dataset.mode === state.eqMode && state.eqEnabled);
   });
 
   const currentPreset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
   if (activeProfileName) {
-    activeProfileName.textContent = currentPreset.label;
-    activeProfileName.style.color = currentPreset.color;
+    if (state.eqEnabled) {
+      activeProfileName.textContent = currentPreset.label;
+      activeProfileName.style.color = currentPreset.color;
+      activeProfileName.classList.remove('bypassed');
+    } else {
+      activeProfileName.textContent = 'BYPASS';
+      activeProfileName.style.color = '';
+      activeProfileName.classList.add('bypassed');
+    }
   }
 }
 
@@ -557,18 +589,38 @@ presetBtns.forEach(btn => {
 modeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const mode = btn.dataset.mode;
+    state.eqEnabled = true; // Auto-engage EQ when user clicks an EQ profile
+    sendStateToBackground('SET_EQ_ENABLED', { enabled: true });
     applyEqProfile(mode, true);
   });
 });
+
+// 3.5 EQ On/Off Toggle Button
+if (btnEqToggle) {
+  btnEqToggle.addEventListener('click', () => {
+    state.eqEnabled = !state.eqEnabled;
+    scheduleSyncUI();
+    sendStateToBackground('SET_EQ_ENABLED', { enabled: state.eqEnabled });
+  });
+}
 
 // 4. Sub-Bass Slider
 if (bassSlider) {
   bassSlider.addEventListener('input', (e) => {
     const db = parseInt(e.target.value, 10);
+    if (db > 0 && !state.eqEnabled) {
+      state.eqEnabled = true;
+      sendStateToBackground('SET_EQ_ENABLED', { enabled: true });
+    }
     applyBass(db, false);
   });
   bassSlider.addEventListener('change', () => {
-    applyBass(parseInt(bassSlider.value, 10), true);
+    const db = parseInt(bassSlider.value, 10);
+    if (db > 0 && !state.eqEnabled) {
+      state.eqEnabled = true;
+      sendStateToBackground('SET_EQ_ENABLED', { enabled: true });
+    }
+    applyBass(db, true);
   });
 }
 
@@ -723,6 +775,7 @@ async function init() {
       state.gain = response.state.gain ?? DEFAULT_GAIN;
       state.bass = response.state.bass ?? 0;
       state.eqMode = response.state.eqMode ?? 'balanced';
+      state.eqEnabled = response.state.eqEnabled ?? false;
       state.pan = response.state.pan ?? 0;
       state.isMuted = response.state.muted ?? false;
       state.isCapturing = response.state.capturing ?? false;

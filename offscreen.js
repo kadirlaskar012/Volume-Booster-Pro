@@ -12,10 +12,10 @@
 'use strict';
 
 const EQ_PRESETS = {
-  balanced: { bassAdd: 0, midGain: 0, highGain: 0 },
-  bass:     { bassAdd: 6, midGain: -1, highGain: 1 },
-  vocal:    { bassAdd: -2, midGain: 5, highGain: 2 },
-  cinema:   { bassAdd: 4, midGain: 1, highGain: 4 }
+  balanced: { bassAdd: 0,    midGain: 0,    highGain: 0 },
+  bass:     { bassAdd: 4.5,  midGain: -1.0, highGain: 1.0 },
+  vocal:    { bassAdd: -1.5, midGain: 2.5,  highGain: 1.5 },
+  cinema:   { bassAdd: 3.0,  midGain: -1.0, highGain: 2.5 }
 };
 
 // Map<tabId, Pipeline>
@@ -34,6 +34,7 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
     gain = 1.0,
     bass = 0,
     eqMode = 'balanced',
+    eqEnabled = false,
     pan = 0,
     muted = false
   } = initialConfig;
@@ -58,21 +59,21 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
   // 3. Create Web Audio DSP Graph
   const sourceNode = audioCtx.createMediaStreamSource(stream);
 
-  // Low-shelf Sub-Bass filter (@ 140Hz)
+  // Low-shelf Sub-Bass filter (@ 80Hz - clean punch, zero vocal boxiness)
   const bassFilter = audioCtx.createBiquadFilter();
   bassFilter.type = 'lowshelf';
-  bassFilter.frequency.setValueAtTime(140, audioCtx.currentTime);
+  bassFilter.frequency.setValueAtTime(80, audioCtx.currentTime);
 
-  // Peaking Mid EQ filter (@ 2.5kHz)
+  // Peaking Mid EQ filter (@ 1.8kHz - smooth presence without megaphone harshness)
   const eqMidFilter = audioCtx.createBiquadFilter();
   eqMidFilter.type = 'peaking';
-  eqMidFilter.frequency.setValueAtTime(2500, audioCtx.currentTime);
-  eqMidFilter.Q.setValueAtTime(1.0, audioCtx.currentTime);
+  eqMidFilter.frequency.setValueAtTime(1800, audioCtx.currentTime);
+  eqMidFilter.Q.setValueAtTime(0.7, audioCtx.currentTime);
 
-  // High-shelf Treble EQ filter (@ 8.0kHz)
+  // High-shelf Treble EQ filter (@ 10.0kHz - silky airy high end, zero sibilance)
   const eqHighFilter = audioCtx.createBiquadFilter();
   eqHighFilter.type = 'highshelf';
-  eqHighFilter.frequency.setValueAtTime(8000, audioCtx.currentTime);
+  eqHighFilter.frequency.setValueAtTime(10000, audioCtx.currentTime);
 
   // Stereo Panner (-1 to +1)
   let panNode = null;
@@ -86,13 +87,13 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
   const effectiveGain = muted ? 0 : gain;
   gainNode.gain.setValueAtTime(effectiveGain, audioCtx.currentTime);
 
-  // Intelligent Soft-Knee Safety Limiter (Prevents harsh clipping & speaker damage)
+  // Studio Soft-Knee Safety Limiter (Transparent, prevents clipping without pumping)
   const limiterNode = audioCtx.createDynamicsCompressor();
-  limiterNode.threshold.setValueAtTime(-1.0, audioCtx.currentTime);
-  limiterNode.knee.setValueAtTime(20.0, audioCtx.currentTime);
-  limiterNode.ratio.setValueAtTime(12.0, audioCtx.currentTime);
-  limiterNode.attack.setValueAtTime(0.003, audioCtx.currentTime);
-  limiterNode.release.setValueAtTime(0.25, audioCtx.currentTime);
+  limiterNode.threshold.setValueAtTime(-0.5, audioCtx.currentTime);
+  limiterNode.knee.setValueAtTime(25.0, audioCtx.currentTime);
+  limiterNode.ratio.setValueAtTime(10.0, audioCtx.currentTime);
+  limiterNode.attack.setValueAtTime(0.004, audioCtx.currentTime);
+  limiterNode.release.setValueAtTime(0.12, audioCtx.currentTime);
 
   // AnalyserNode for Real-time Spectrum Data
   const analyserNode = audioCtx.createAnalyser();
@@ -120,14 +121,14 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
   gainNode.connect(limiterNode);
   limiterNode.connect(analyserNode);
 
-  // Route output to both audio destination and MediaStream destination
+  // Primary Output: Route directly to hardware speakers
   limiterNode.connect(audioCtx.destination);
-  limiterNode.connect(destNode);
 
-  // Maintain active HTML Audio element to guarantee continuous stream consumption
+  // MediaStream keep-alive: MUST be muted to prevent double playback / comb filter phasing
+  limiterNode.connect(destNode);
   const audioEl = new Audio();
   audioEl.srcObject = destNode.stream;
-  audioEl.volume = 1.0;
+  audioEl.muted = true;
   await audioEl.play().catch(() => {});
 
   const pipeline = {
@@ -147,12 +148,13 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
     gain,
     bass,
     eqMode,
+    eqEnabled,
     pan,
     muted
   };
 
-  // Apply initial EQ & Bass
-  updateFilters(pipeline);
+  // Apply initial EQ & Bass (respects eqEnabled)
+  updateFilters(pipeline, false);
 
   // Listen for stream ended (tab closed or navigated)
   const audioTrack = stream.getAudioTracks()[0];
@@ -164,20 +166,29 @@ async function startPipeline(tabId, streamId, initialConfig = {}) {
   }
 
   pipelines.set(tabId, pipeline);
-  console.log(`[VBP Offscreen] Started pipeline for tab ${tabId} with gain ${gain}x`);
+  console.log(`[VBP Offscreen] Started pipeline for tab ${tabId} (Gain: ${gain}x, EQ Enabled: ${eqEnabled})`);
   return pipeline;
 }
 
 /**
- * Update EQ filters based on preset and sub-bass intensity
+ * Update EQ filters based on preset, sub-bass intensity, and eqEnabled switch
  */
 function updateFilters(pipeline, smooth = true) {
-  const { audioCtx, bassFilter, eqMidFilter, eqHighFilter, bass, eqMode } = pipeline;
+  const { audioCtx, bassFilter, eqMidFilter, eqHighFilter, bass, eqMode, eqEnabled } = pipeline;
   if (!audioCtx) return;
 
-  const preset = EQ_PRESETS[eqMode] || EQ_PRESETS.balanced;
   const timeConst = smooth ? 0.015 : 0.001;
-  const targetBass = Math.min(18, Math.max(0, bass + preset.bassAdd));
+
+  if (!eqEnabled) {
+    // Transparent 0 dB bypass when EQ is switched off
+    if (bassFilter)   bassFilter.gain.setTargetAtTime(0, audioCtx.currentTime, timeConst);
+    if (eqMidFilter)  eqMidFilter.gain.setTargetAtTime(0, audioCtx.currentTime, timeConst);
+    if (eqHighFilter) eqHighFilter.gain.setTargetAtTime(0, audioCtx.currentTime, timeConst);
+    return;
+  }
+
+  const preset = EQ_PRESETS[eqMode] || EQ_PRESETS.balanced;
+  const targetBass = Math.min(14, Math.max(0, bass + preset.bassAdd));
 
   if (bassFilter) {
     bassFilter.gain.setTargetAtTime(targetBass, audioCtx.currentTime, timeConst);
@@ -248,10 +259,19 @@ async function handleOffscreenMessage(msg) {
         gain: msg.gain,
         bass: msg.bass,
         eqMode: msg.eqMode,
+        eqEnabled: !!msg.eqEnabled,
         pan: msg.pan,
         muted: msg.muted
       });
       return { success: true };
+    }
+
+    case 'SET_EQ_ENABLED': {
+      if (!pipelines.has(tabId)) return { success: false };
+      const p = pipelines.get(tabId);
+      p.eqEnabled = !!msg.enabled;
+      updateFilters(p, true);
+      return { success: true, eqEnabled: p.eqEnabled };
     }
 
     case 'SET_GAIN': {

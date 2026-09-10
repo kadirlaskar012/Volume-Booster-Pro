@@ -521,7 +521,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 14px;
+  height: 16px;
 }
 
 .section-title {
@@ -535,10 +535,68 @@ body {
   gap: 4px;
 }
 
+.eq-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .profile-pill {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 800;
   color: var(--accent-cyan);
+  transition: color 0.18s ease, opacity 0.18s ease;
+}
+
+.profile-pill.bypassed {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+/* EQ ON/OFF Toggle Switch Button */
+.eq-toggle-btn {
+  height: 16px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border);
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.eq-toggle-btn.eq-off {
+  background: var(--btn-bg);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+.eq-toggle-btn.eq-off .eq-toggle-knob {
+  width: 5.5px;
+  height: 5.5px;
+  border-radius: 50%;
+  background: #64748B;
+  transition: background-color 0.18s ease;
+}
+
+.eq-toggle-btn.eq-on {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.6);
+  color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.25);
+}
+
+.eq-toggle-btn.eq-on .eq-toggle-knob {
+  width: 5.5px;
+  height: 5.5px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 5px #10B981;
+  transition: background-color 0.18s ease;
 }
 
 .modes-grid {
@@ -546,6 +604,14 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
   margin-top: 3px;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.modes-grid.disabled,
+.bass-control-wrapper.disabled {
+  opacity: 0.45;
+  filter: grayscale(0.35);
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
 .mode-btn {

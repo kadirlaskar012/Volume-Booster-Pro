@@ -69,18 +69,19 @@ async function getTabDomain(tabId) {
 
 async function loadDomainSettings(domain) {
   if (!domain || !chrome?.storage?.local) {
-    return { gain: DEFAULT_GAIN, bass: 0, eqMode: 'balanced', pan: 0 };
+    return { gain: DEFAULT_GAIN, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0 };
   }
   const key = `vol_${domain}`;
   const res = await chrome.storage.local.get(key);
   const saved = res[key];
   if (typeof saved === 'number') {
-    return { gain: saved, bass: 0, eqMode: 'balanced', pan: 0 };
+    return { gain: saved, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0 };
   }
   return {
     gain: saved?.gain ?? DEFAULT_GAIN,
     bass: saved?.bass ?? 0,
     eqMode: saved?.eqMode ?? 'balanced',
+    eqEnabled: saved?.eqEnabled ?? false,
     pan: saved?.pan ?? 0
   };
 }
@@ -92,6 +93,7 @@ async function saveDomainSettings(domain, state) {
     gain: state.gain,
     bass: state.bass,
     eqMode: state.eqMode,
+    eqEnabled: state.eqEnabled,
     pan: state.pan
   };
   await chrome.storage.local.set({ [key]: data }).catch(() => {});
@@ -104,6 +106,7 @@ async function initTabState(tabId) {
     gain: settings.gain,
     bass: settings.bass,
     eqMode: settings.eqMode,
+    eqEnabled: settings.eqEnabled ?? false,
     pan: settings.pan,
     muted: false,
     domain,
@@ -197,6 +200,7 @@ async function handleMessage(message, sender) {
         gain: state.gain,
         bass: state.bass,
         eqMode: state.eqMode,
+        eqEnabled: state.eqEnabled,
         pan: state.pan,
         muted: state.muted
       });
@@ -287,6 +291,25 @@ async function handleMessage(message, sender) {
 
       await saveDomainSettings(state.domain, state);
       return { success: true };
+    }
+
+    // ── EQ Enabled / Bypass Toggle ──
+    case 'SET_EQ_ENABLED': {
+      const state = await getTabState(tabId);
+      state.eqEnabled = !!message.enabled;
+      tabState.set(tabId, state);
+
+      if (state.capturing && (await hasOffscreenDocument())) {
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_EQ_ENABLED',
+          tabId,
+          enabled: state.eqEnabled
+        }).catch(() => {});
+      }
+
+      await saveDomainSettings(state.domain, state);
+      return { success: true, eqEnabled: state.eqEnabled };
     }
 
     // ── Stereo Pan ──
