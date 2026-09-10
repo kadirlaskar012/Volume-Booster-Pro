@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volume Booster Pro</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+
+  <!-- ── Top Bar ──────────────────────────────────────────────────────── -->
+  <div class="top-bar">
+    <div class="brand-wrapper">
+      <svg id="logo-icon" class="brand-speaker-glow" width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <defs>
+          <linearGradient id="vbp-grad-ultra" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="60%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#EC4899"/>
+          </linearGradient>
+        </defs>
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-title">Volume Booster</span>
+      <span class="pro-chip">PRO</span>
+    </div>
+
+    <!-- FX & Settings Gear Toggle -->
+    <button id="btn-settings" title="Audio FX Settings" class="btn-icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── Domain Info Bar ──────────────────────────────────────────────── -->
+  <div id="domain-bar" class="domain-bar">
+    <div id="site-favicon" class="favicon-box">
+      <img id="favicon-img" src="" alt="" class="hidden" />
+      <span id="favicon-fallback" style="font-size: 10px;">🌐</span>
+    </div>
+    <span id="domain-text" class="domain-text">Connecting…</span>
+    <span id="capture-status" class="status-badge hidden">Enabled</span>
+  </div>
+
+  <!-- ── Error / System Notice Banner ─────────────────────────────────── -->
+  <div id="error-banner" class="notice-banner hidden">
+    <p id="error-text" class="notice-text"></p>
+  </div>
+
+  <!-- ── Main Volume Card (With Live Mini Spectrum) ───────────────────── -->
+  <div class="volume-card">
+
+    <div class="card-top">
+      <div id="glow-orb" class="glow-orb"></div>
+
+      <!-- 4-Tier Status Indicator -->
+      <div class="status-row">
+        <div id="boost-indicator" class="status-dot status-idle"></div>
+        <span id="boost-label" class="status-label status-idle">IDLE</span>
+      </div>
+
+      <!-- Big Percentage Number -->
+      <div id="volume-display" class="volume-number tier-normal">
+        100%
+      </div>
+
+      <!-- Gain Subtext -->
+      <div id="gain-subtext" class="gain-subtext">1.00× (Baseline)</div>
+      <div id="volume-hint" class="volume-hint hidden">Drag slider to amplify audio</div>
+
+      <!-- Live Mini Audio Visualizer Canvas -->
+      <div class="visualizer-wrapper">
+        <canvas id="popup-visualizer"></canvas>
+      </div>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <!-- Volume Slider & Preset Buttons -->
+    <div class="slider-area">
+      <div class="slider-labels">
+        <span>0%</span>
+        <span>150%</span>
+        <span>300%</span>
+        <span>450%</span>
+        <span>600%</span>
+      </div>
+
+      <input
+        type="range"
+        id="volume-slider"
+        min="0"
+        max="600"
+        value="100"
+        step="1"
+        class="volume-slider"
+        aria-label="Volume boost level"
+      />
+
+      <!-- Quick Preset Buttons -->
+      <div class="presets-row">
+        <button class="preset-btn" data-value="100">1×</button>
+        <button class="preset-btn" data-value="150">1.5×</button>
+        <button class="preset-btn" data-value="200">2×</button>
+        <button class="preset-btn" data-value="300">3×</button>
+        <button class="preset-btn" data-value="400">4×</button>
+        <button class="preset-btn" data-value="600">6×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pro Audio DSP & Sound Profiles (Compact & Fitted) ───────────── -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-title">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Sound Profile (EQ)
+      </span>
+      <span id="active-profile-name" class="profile-pill">Balanced</span>
+    </div>
+    <div class="modes-grid">
+      <button class="mode-btn active" data-mode="balanced">
+        <span class="mode-icon">🎧</span>
+        <span class="mode-name">Balanced</span>
+      </button>
+      <button class="mode-btn" data-mode="bass">
+        <span class="mode-icon">🔊</span>
+        <span class="mode-name">Bass Boost</span>
+      </button>
+      <button class="mode-btn" data-mode="vocal">
+        <span class="mode-icon">🗣️</span>
+        <span class="mode-name">Vocal Clear</span>
+      </button>
+      <button class="mode-btn" data-mode="cinema">
+        <span class="mode-icon">🎬</span>
+        <span class="mode-name">Cinema 3D</span>
+      </button>
+    </div>
+
+    <!-- Sub-Bass Booster Row -->
+    <div class="bass-control-wrapper">
+      <div class="section-header bass-header">
+        <span class="section-title">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Sub-Bass Booster
+        </span>
+        <span id="bass-db-text" class="bass-value-pill">+0 dB</span>
+      </div>
+      <input
+        type="range"
+        id="bass-slider"
+        min="0"
+        max="15"
+        value="0"
+        step="1"
+        class="bass-slider"
+        aria-label="Bass boost intensity"
+      />
+    </div>
+  </div>
+
+  <!-- ── Action Buttons Row ───────────────────────────────────────────── -->
+  <div class="actions-row">
+    <!-- Main Boost Toggle -->
+    <button id="btn-boost" class="btn-boost state-inactive">
+      <svg id="boost-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="15" y1="9" x2="15" y2="15"/>
+        <line x1="19" y1="7" x2="19" y2="17"/>
+        <line x1="23" y1="5" x2="23" y2="19"/>
+      </svg>
+      <span id="boost-btn-text">Enable Boost</span>
+    </button>
+
+    <!-- Mute Button -->
+    <button id="btn-mute" title="Mute/Unmute" class="btn-action">
+      <svg id="mute-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+    </button>
+
+    <!-- Reset to 100% -->
+    <button id="btn-reset" title="Reset to 100%" class="btn-action">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── Collapsible Advanced FX (Stereo Pan Balance) ─────────────────── -->
+  <div id="settings-panel" class="fx-panel hidden">
+    <div class="section-header">
+      <span class="section-title">Stereo Balance (L / R)</span>
+      <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+    </div>
+    <div class="pan-control-row">
+      <span class="pan-label">L</span>
+      <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
+      <span class="pan-label">R</span>
+    </div>
+  </div>
+
+  <!-- ── Footer Bar ───────────────────────────────────────────────────── -->
+  <div class="footer-bar">
+    <div>
+      <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
+      <span style="margin-left: 6px;">boost hotkeys</span>
+    </div>
+    <span class="footer-ver">v2.0 • Web Audio DSP</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
