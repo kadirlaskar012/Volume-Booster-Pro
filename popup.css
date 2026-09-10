@@ -88,28 +88,38 @@ body::-webkit-scrollbar-thumb { background: #2E2E52; border-radius: 99px; }
 }
 
 .btn-icon {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   color: var(--text-muted);
-  border-radius: 7px;
-  padding: 5px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-icon:hover {
   color: #FFFFFF;
-  background: rgba(108, 99, 255, 0.15);
-  border-color: var(--accent);
+  background: rgba(108, 99, 255, 0.25);
+  border-color: #818CF8;
+  transform: rotate(25deg) scale(1.08);
+  box-shadow: 0 0 12px rgba(108, 99, 255, 0.45);
+}
+
+.btn-icon:active {
+  transform: rotate(45deg) scale(0.95);
 }
 
 .btn-icon.active {
-  background: rgba(108, 99, 255, 0.25);
-  color: #A5B4FC;
-  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.35), rgba(6, 182, 212, 0.3));
+  color: #67E8F9;
+  border-color: #38BDF8;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
 }
 
 /* ── Domain Info Bar ─────────────────────────────────────────────────────── */
@@ -246,10 +256,13 @@ body::-webkit-scrollbar-thumb { background: #2E2E52; border-radius: 99px; }
   animation: pulse-cyan 2s ease-in-out infinite;
 }
 
-.status-boosted { color: #C084FC; }
+.status-boosted {
+  color: #E879F9;
+  text-shadow: 0 0 10px rgba(232, 121, 249, 0.65);
+}
 .status-dot.status-boosted {
-  background: #A855F7;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.85);
+  background: #E879F9;
+  box-shadow: 0 0 10px rgba(232, 121, 249, 0.95);
   animation: pulse-purple 1.6s ease-in-out infinite;
 }
 
@@ -705,31 +718,64 @@ body::-webkit-scrollbar-thumb { background: #2E2E52; border-radius: 99px; }
   color: #F87171;
 }
 
+/* Reset Button — Subtle Red/Warning Tint (Destructive Action) */
+.btn-reset-action {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #F87171;
+}
+
+.btn-reset-action:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.7);
+  color: #FCA5A5;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+.btn-reset-action:active {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(0.95);
+}
+
 /* ── Footer / Shortcut Hint ──────────────────────────────────────────────── */
 .footer-bar {
-  padding: 0 14px 2px 14px;
+  padding: 3px 14px 4px 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 9.5px;
-  color: var(--text-muted);
+  justify-content: center;
+}
+
+.hotkey-tip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 3px 10px;
+  border-radius: 6px;
 }
 
 .kbd-shortcut {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 1px 4px;
-  font-size: 9px;
-  font-family: monospace;
-  color: var(--text-main);
+  background: #1E1E38;
+  border: 1px solid #474775;
+  border-bottom: 2px solid #5B5B92;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #38BDF8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.hotkey-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #CBD5E1;
 }
 
 .footer-ver {
-  font-size: 9px;
-  color: var(--text-sub);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  display: none !important; /* Hidden in production build */
 }
 
 /* ── Interactive States ──────────────────────────────────────────────────── */

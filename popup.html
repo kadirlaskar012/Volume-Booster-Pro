@@ -186,8 +186,8 @@
       </svg>
     </button>
 
-    <!-- Reset to 100% -->
-    <button id="btn-reset" title="Reset to 100%" class="btn-action">
+    <!-- Reset to 100% (Subtle Red Tint) -->
+    <button id="btn-reset" title="Reset to 100%" class="btn-action btn-reset-action">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="1 4 1 10 7 10"/>
         <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
@@ -208,13 +208,13 @@
     </div>
   </div>
 
-  <!-- ── Footer Bar ───────────────────────────────────────────────────── -->
+  <!-- ── Footer Bar (Prominent Hotkey Tip, Version Hidden in Prod) ───── -->
   <div class="footer-bar">
-    <div>
+    <div class="hotkey-tip">
       <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
-      <span style="margin-left: 6px;">boost hotkeys</span>
+      <span class="hotkey-label">to adjust boost</span>
     </div>
-    <span class="footer-ver">v2.0 • Web Audio DSP</span>
+    <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
   </div>
 
   <script src="popup.js"></script>

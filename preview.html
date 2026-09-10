@@ -262,7 +262,7 @@
               </svg>
             </button>
 
-            <button id="btn-reset" title="Reset to 100%" class="btn-action">
+            <button id="btn-reset" title="Reset to 100%" class="btn-action btn-reset-action">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="1 4 1 10 7 10"/>
                 <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
@@ -271,12 +271,12 @@
           </div>
 
           <!-- Shortcut Hint -->
-          <div class="px-5 pb-3 flex items-center justify-between text-[11px] text-slate-400">
-            <div>
-              <kbd class="px-1.5 py-0.5 bg-panel border border-border rounded text-slate-300 text-[10px] font-mono">Ctrl+Shift+↑↓</kbd>
-              <span class="ml-1">adjust boost</span>
+          <div class="px-5 pb-3 flex items-center justify-center text-[11px] text-slate-400">
+            <div class="hotkey-tip">
+              <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
+              <span class="hotkey-label">to adjust boost</span>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold tracking-wider">v2.0 • Web Audio DSP</span>
+            <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
           </div>
 
           <!-- Pro Settings Panel (Collapsible) -->
@@ -592,8 +592,17 @@
       captureStatus.classList.toggle('status-active', state.isCapturing);
       captureStatus.classList.toggle('status-inactive', !state.isCapturing);
 
-      // 8. Toolbar icon badge
-      badge.textContent = effectivePct === 0 ? 'OFF' : `${(effectivePct / 100).toFixed(1)}×`;
+      // 8. Toolbar icon badge (Dynamic color matching boost tier)
+      badge.textContent = effectivePct === 0 ? 'OFF' : `${(effectivePct / 100).toFixed(1).replace('.0', '')}×`;
+      if (effectivePct === 0) {
+        badge.style.backgroundColor = '#64748B';
+      } else if (effectivePct > 400) {
+        badge.style.backgroundColor = '#EF4444'; // Red/Amber warning
+      } else if (effectivePct > 150) {
+        badge.style.backgroundColor = '#2563EB'; // Blue
+      } else {
+        badge.style.backgroundColor = '#8B5CF6'; // Purple (1–150%)
+      }
 
       // 9. Update Telemetry Card
       if (meterLevelText) meterLevelText.textContent = `${effectiveGain.toFixed(2)}× (${effectivePct}%)`;

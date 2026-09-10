@@ -65,11 +65,22 @@ async function updateBadge(tabId, gainValue, muted) {
       return;
     }
     const pct = Math.round(gainValue * 100);
-    const label = pct >= 100 ? `${Math.round(pct / 10) * 10}%`.replace('0%', '%') : `${pct}%`;
-    // Keep badge short: show "3×" style for high values
-    const badgeText = pct >= 200 ? `${Math.round(gainValue)}×` : `${pct}%`;
+    // Keep badge short: show "3×" style for values >= 200%, otherwise "150%"
+    const badgeText = pct >= 200 ? `${(pct / 100).toFixed(1).replace('.0', '')}×` : `${pct}%`;
     await chrome.action.setBadgeText({ text: badgeText, tabId });
-    await chrome.action.setBadgeBackgroundColor({ color: '#6C63FF', tabId });
+
+    // Dynamic badge color:
+    // 1–150%   → Purple (#8B5CF6)
+    // 151–400% → Blue (#2563EB)
+    // 400%+    → Amber/Red warning zone (#EF4444)
+    let badgeColor = '#8B5CF6';
+    if (pct > 400) {
+      badgeColor = '#EF4444';
+    } else if (pct > 150) {
+      badgeColor = '#2563EB';
+    }
+
+    await chrome.action.setBadgeBackgroundColor({ color: badgeColor, tabId });
   } catch (e) {
     // Tab may have been closed
   }
