@@ -883,7 +883,7 @@ body {
 .tool-chip {
   flex: 1;
   height: 23px;
-  padding: 0 5px;
+  padding: 0 4px;
   border-radius: 6px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -893,11 +893,41 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.16s ease;
   user-select: none;
+  position: relative;
+}
+
+.chip-new-tag {
+  position: absolute;
+  top: -5.5px;
+  right: 3px;
+  font-size: 6.5px;
+  font-weight: 900;
+  letter-spacing: 0.35px;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 1px 3.5px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+  color: #FFFFFF;
+  box-shadow: 0 1px 5px rgba(236, 72, 153, 0.45);
+  pointer-events: none;
+  animation: pulseNewTag 2.6s ease-in-out infinite;
+}
+
+@keyframes pulseNewTag {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 1px 4px rgba(236, 72, 153, 0.45);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 1px 8px rgba(236, 72, 153, 0.7);
+  }
 }
 
 .tool-chip:hover {
@@ -941,6 +971,24 @@ body {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.01em;
+}
+
+.badge-new-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 1.5px 4px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+  color: #FFFFFF;
+  margin-left: 5px;
+  vertical-align: middle;
+  box-shadow: 0 0 5px rgba(236, 72, 153, 0.4);
 }
 
 /* ── Settings Drawer Detailed Cards ─────────────────────────────────────── */
