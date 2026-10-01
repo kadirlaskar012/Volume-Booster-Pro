@@ -50,6 +50,7 @@ const btnChipNormalizer   = document.getElementById('btn-chip-normalizer');
 const btnChipDialogue     = document.getElementById('btn-chip-dialogue');
 const btnChipTimer        = document.getElementById('btn-chip-timer');
 const chipTimerText       = document.getElementById('chip-timer-text');
+const chipTimerNew        = document.getElementById('chip-timer-new');
 const btnDrawerNormalizer = document.getElementById('btn-drawer-normalizer');
 const btnDrawerDialogue   = document.getElementById('btn-drawer-dialogue');
 const drawerTimerStatus   = document.getElementById('drawer-timer-status');
@@ -315,6 +316,7 @@ function syncUI() {
   if (isTimerActive) {
     const timeFormatted = formatTimer(state.sleepTimer.remainingSec);
     if (chipTimerText) chipTimerText.textContent = `⏳ ${timeFormatted}`;
+    if (chipTimerNew) chipTimerNew.classList.add('hidden');
     if (btnChipTimer) btnChipTimer.classList.add('active-emerald');
     if (drawerTimerStatus) {
       drawerTimerStatus.textContent = `⏳ ${timeFormatted}`;
@@ -329,6 +331,7 @@ function syncUI() {
     });
   } else {
     if (chipTimerText) chipTimerText.textContent = 'Timer: Off';
+    if (chipTimerNew) chipTimerNew.classList.remove('hidden');
     if (btnChipTimer) btnChipTimer.classList.remove('active-emerald');
     if (drawerTimerStatus) {
       drawerTimerStatus.textContent = 'Off';
@@ -944,7 +947,7 @@ async function init() {
         captureStatus.textContent = '○ Inactive';
         captureStatus.className = 'status-badge status-inactive';
       }
-      showError('Chrome Security: Audio capture is restricted on internal system pages. Please open a media website playing audio to boost sound.');
+      showError('System page: Audio capture is restricted. Open any website playing audio to boost.');
       disableControls();
       scheduleSyncUI();
       return;
