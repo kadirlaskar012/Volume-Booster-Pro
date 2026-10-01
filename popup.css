@@ -832,12 +832,13 @@ body {
   inset: 0;
   background: var(--bg-dark);
   z-index: 50;
-  padding: 12px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 12px;
+  gap: 8px;
   animation: fadeIn 0.18s ease-out;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -850,7 +851,7 @@ body {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 
 .drawer-title {
@@ -859,23 +860,221 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .drawer-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 7px;
+}
+
+/* ── Smart Tools Bar (1-Click Enhancers) ────────────────────────────────── */
+.smart-tools-bar {
+  display: flex;
+  gap: 5px;
+  height: 23px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.tool-chip {
+  flex: 1;
+  height: 23px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+
+.tool-chip:hover {
+  border-color: var(--border-glow);
+  color: var(--text-main);
+  background: var(--btn-hover);
+}
+
+.tool-chip.active-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: var(--accent-cyan);
+  color: #06B6D4;
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.3);
+}
+
+.tool-chip.active-purple {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: #A78BFA;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.3);
+}
+
+.tool-chip.active-emerald {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22C55E;
+  color: #4ADE80;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.3);
+  animation: pulseGreen 2s infinite ease-in-out;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 0 4px rgba(34, 197, 94, 0.3); }
+  50%      { box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
+}
+
+.tool-icon {
+  font-size: 10px;
+}
+
+.tool-text {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* ── Settings Drawer Detailed Cards ─────────────────────────────────────── */
+.setting-item {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 6px 8px;
+  transition: border-color 0.15s ease;
+}
+
+.setting-item:hover {
+  border-color: var(--border-glow);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.setting-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.setting-sub {
+  font-size: 8px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Toggle Switch */
+.switch-toggle {
+  width: 32px;
+  height: 18px;
+  border-radius: 99px;
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.switch-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+}
+
+.switch-toggle.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+  border-color: transparent;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+}
+
+.switch-toggle.active .switch-thumb {
+  transform: translateX(14px);
+  background: #FFFFFF;
+}
+
+/* Timer Badge & Presets */
+.timer-badge-pill {
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.timer-badge-pill.active {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22C55E;
+  color: #4ADE80;
+}
+
+.timer-presets-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.timer-preset-btn {
+  flex: 1;
+  height: 20px;
+  font-size: 8.5px;
+  font-weight: 700;
+  border-radius: 4px;
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.timer-preset-btn:hover {
+  background: var(--btn-hover);
+  color: var(--text-main);
+}
+
+.timer-preset-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+  color: #FFFFFF;
+  border-color: transparent;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(6, 182, 212, 0.35);
 }
 
 .pan-control-row {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .pan-label {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -904,13 +1103,13 @@ body {
 }
 
 .btn-pill-reset {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 700;
   background: var(--btn-bg);
   border: 1px solid var(--border);
   color: var(--text-muted);
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 1px 5px;
   cursor: pointer;
 }
 
@@ -920,10 +1119,10 @@ body {
 }
 
 .drawer-tip {
-  font-size: 9.5px;
+  font-size: 8.5px;
   color: var(--text-muted);
-  line-height: 1.4;
-  margin-top: 6px;
+  line-height: 1.35;
+  margin-top: 4px;
 }
 
 /* ── Interactive States ──────────────────────────────────────────────────── */

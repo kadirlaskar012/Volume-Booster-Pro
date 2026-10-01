@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,14 +14,14 @@
       theme: {
         extend: {
           colors: {
-            accent:  '#6C63FF',
+            accent: '#6C63FF',
             accent2: '#38BDF8',
             warning: '#F59E0B',
-            dark:    '#0B0B14',
-            panel:   '#151528',
-            card:    '#1C1C36',
-            border:  '#2E2E52',
-            muted:   '#94A3B8',
+            dark: '#0B0B14',
+            panel: '#151528',
+            card: '#1C1C36',
+            border: '#2E2E52',
+            muted: '#94A3B8',
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -33,12 +34,14 @@
   <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="popup.css" />
 
   <style>
     /* Full Responsive Viewport Base (Never clipped by popup.css) */
-    html, body {
+    html,
+    body {
       width: 100% !important;
       min-height: 100vh !important;
       margin: 0 !important;
@@ -59,30 +62,37 @@
       background: radial-gradient(circle at 50% 0%, #EEF2FF 0%, #F8FAFC 85%) !important;
       color: #0F172A !important;
     }
+
     html[data-theme="light"] .preview-panel {
       background: #FFFFFF !important;
       border-color: #E2E8F0 !important;
       box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
     }
+
     html[data-theme="light"] .preview-panel-sub {
       background: #F8FAFC !important;
       border-color: #E2E8F0 !important;
     }
+
     html[data-theme="light"] .text-preview-white {
       color: #0F172A !important;
     }
+
     html[data-theme="light"] .text-preview-muted {
       color: #64748B !important;
     }
+
     html[data-theme="light"] .chrome-mockup {
       background: #FFFFFF !important;
       border-color: #CBD5E1 !important;
       box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
     }
+
     html[data-theme="light"] .chrome-tab-bar {
       background: #F1F5F9 !important;
       border-color: #E2E8F0 !important;
     }
+
     html[data-theme="light"] .chrome-url-box {
       background: #FFFFFF !important;
       border-color: #CBD5E1 !important;
@@ -93,6 +103,7 @@
     .glow-canvas {
       box-shadow: 0 0 35px rgba(108, 99, 255, 0.18), 0 0 15px rgba(56, 189, 248, 0.12);
     }
+
     .chrome-mockup {
       box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
       width: 322px;
@@ -108,17 +119,21 @@
 
     <!-- Header Section -->
     <header class="text-center mb-6 md:mb-8">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-3">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-3">
         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
         <span>LIVE TESTBENCH & REAL-TIME PREVIEW</span>
       </div>
 
-      <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-sky-200 to-cyan-300">
+      <h1
+        class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-sky-200 to-cyan-300">
         Volume Booster Pro 🔊
       </h1>
 
-      <p class="text-slate-400 text-xs sm:text-sm md:text-base mt-2 max-w-xl mx-auto leading-relaxed text-preview-muted">
-        Experience up to 600% Web Audio API amplification live. Test sound presets, adjust Sub-Bass, toggle themes, and watch both audio spectrum visualizers react.
+      <p
+        class="text-slate-400 text-xs sm:text-sm md:text-base mt-2 max-w-xl mx-auto leading-relaxed text-preview-muted">
+        Experience up to 600% Web Audio API amplification live. Test sound presets, adjust Sub-Bass, toggle themes, and
+        watch both audio spectrum visualizers react.
       </p>
     </header>
 
@@ -127,14 +142,18 @@
 
       <!-- LEFT COLUMN: Exact 320x420 Extension Popup inside Chrome Window Mockup -->
       <section class="lg:col-span-5 flex flex-col items-center w-full">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5 text-preview-muted">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        <div
+          class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5 text-preview-muted">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18" />
+          </svg>
           <span>Extension Popup UI (Exact 320 × 420px)</span>
         </div>
 
         <!-- Chrome Browser Frame Mockup -->
         <div class="chrome-mockup rounded-2xl bg-[#121222] border border-border overflow-hidden">
-          
+
           <!-- Chrome Tab / Toolbar Bar -->
           <div class="chrome-tab-bar bg-[#0f0f1c] px-3.5 py-2 border-b border-border flex items-center justify-between">
             <div class="flex items-center gap-1.5">
@@ -142,16 +161,22 @@
               <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
               <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
             </div>
-            
-            <div class="chrome-url-box flex items-center gap-1.5 bg-[#1b1b30] px-2.5 py-1 rounded-md text-[10.5px] text-slate-400 max-w-[170px] truncate border border-border/40">
-              <svg class="w-3 h-3 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+
+            <div
+              class="chrome-url-box flex items-center gap-1.5 bg-[#1b1b30] px-2.5 py-1 rounded-md text-[10.5px] text-slate-400 max-w-[170px] truncate border border-border/40">
+              <svg class="w-3 h-3 text-green-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd"></path>
+              </svg>
               <span class="truncate">youtube.com/watch?v=lofi</span>
             </div>
 
             <!-- Active Extension Icon with Badge -->
             <div class="relative cursor-pointer" title="Volume Booster Pro Extension">
               <img src="icons/icon32.png" class="w-4 h-4 rounded" alt="icon" />
-              <span id="demo-badge" class="absolute -top-1.5 -right-2 text-[8px] bg-accent text-white font-bold px-1 rounded-full scale-90">1×</span>
+              <span id="demo-badge"
+                class="absolute -top-1.5 -right-2 text-[8px] bg-accent text-white font-bold px-1 rounded-full scale-90">1×</span>
             </div>
           </div>
 
@@ -164,14 +189,17 @@
                 <svg id="logo-icon" class="brand-speaker-glow" width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <defs>
                     <linearGradient id="vbp-grad-ultra" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#38BDF8"/>
-                      <stop offset="60%" stop-color="#8B5CF6"/>
-                      <stop offset="100%" stop-color="#EC4899"/>
+                      <stop offset="0%" stop-color="#38BDF8" />
+                      <stop offset="60%" stop-color="#8B5CF6" />
+                      <stop offset="100%" stop-color="#EC4899" />
                     </linearGradient>
                   </defs>
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="url(#vbp-grad-ultra)" stroke-width="2.3" stroke-linecap="round"/>
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="url(#vbp-grad-ultra)" stroke-width="2.3"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="url(#vbp-grad-ultra)" stroke-width="2.3"
+                    stroke-linecap="round" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="url(#vbp-grad-ultra)" stroke-width="2.3"
+                    stroke-linecap="round" />
                 </svg>
                 <span class="brand-title">Volume Booster</span>
                 <span class="pro-chip">PRO</span>
@@ -179,27 +207,37 @@
 
               <!-- Top Right Actions: Theme Toggle & Settings Gear -->
               <div class="top-actions">
-                <button id="btn-theme" title="Toggle Light/Dark Theme" class="btn-icon btn-theme" aria-label="Toggle Theme">
-                  <svg id="theme-icon-sun" class="theme-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"/>
-                    <line x1="12" y1="1" x2="12" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="23"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                    <line x1="1" y1="12" x2="3" y2="12"/>
-                    <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                <button id="btn-theme" title="Toggle Light/Dark Theme" class="btn-icon btn-theme"
+                  aria-label="Toggle Theme">
+                  <svg id="theme-icon-sun" class="theme-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                   </svg>
-                  <svg id="theme-icon-moon" class="theme-icon hidden" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                  <svg id="theme-icon-moon" class="theme-icon hidden" width="13" height="13" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                   </svg>
                 </button>
 
+                <!-- Sleep Timer Quick Button -->
+                <button id="btn-quick-timer" title="Audio Sleep Timer" class="btn-icon" aria-label="Sleep Timer">
+                  <span id="top-timer-icon" style="font-size: 11px;">⏰</span>
+                </button>
+
                 <button id="btn-settings" title="Audio FX Settings" class="btn-icon" aria-label="Settings">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                   </svg>
                 </button>
               </div>
@@ -212,6 +250,24 @@
               </div>
               <span id="domain-text" class="domain-text">youtube.com</span>
               <span id="capture-status" class="status-badge status-active">● Enabled</span>
+            </div>
+
+            <!-- ── Smart Audio Tools Bar (1-Click Enhancers) ────────────────────── -->
+            <div class="smart-tools-bar">
+              <button id="btn-chip-normalizer" class="tool-chip" title="Auto Volume Normalizer: Evens out loud spikes & quiet dialogue">
+                <span class="tool-icon">🌙</span>
+                <span class="tool-text">Normalizer</span>
+              </button>
+
+              <button id="btn-chip-dialogue" class="tool-chip" title="Dialogue Clarity: Acoustically boosts speech presence">
+                <span class="tool-icon">🗣️</span>
+                <span class="tool-text">Clear Voice</span>
+              </button>
+
+              <button id="btn-chip-timer" class="tool-chip" title="Sleep Timer: Auto fade-out & stop">
+                <span class="tool-icon">⏱️</span>
+                <span id="chip-timer-text" class="tool-text">Timer: Off</span>
+              </button>
             </div>
 
             <!-- Notice Banner (Hidden) -->
@@ -257,16 +313,8 @@
                   <span>600%</span>
                 </div>
 
-                <input
-                  type="range"
-                  id="volume-slider"
-                  min="0"
-                  max="600"
-                  value="100"
-                  step="1"
-                  class="volume-slider"
-                  aria-label="Volume boost level"
-                />
+                <input type="range" id="volume-slider" min="0" max="600" value="100" step="1" class="volume-slider"
+                  aria-label="Volume boost level" />
 
                 <div class="presets-row">
                   <button class="preset-btn active" data-value="100">1×</button>
@@ -283,12 +331,17 @@
             <div class="section-card">
               <div class="section-header">
                 <span class="section-title">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
                   Sound Profile (EQ)
                 </span>
                 <div class="eq-header-right">
                   <span id="active-profile-name" class="profile-pill bypassed">BYPASS</span>
-                  <button id="btn-eq-toggle" class="eq-toggle-btn eq-off" title="Toggle Equalizer On/Off" aria-label="Toggle Equalizer">
+                  <button id="btn-eq-toggle" class="eq-toggle-btn eq-off" title="Toggle Equalizer On/Off"
+                    aria-label="Toggle Equalizer">
                     <span class="eq-toggle-knob"></span>
                     <span id="eq-toggle-label" class="eq-toggle-label">OFF</span>
                   </button>
@@ -317,48 +370,45 @@
               <div class="bass-control-wrapper">
                 <div class="section-header bass-header">
                   <span class="section-title">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2.5">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
                     Sub-Bass Booster
                   </span>
                   <span id="bass-db-text" class="bass-value-pill">+0 dB</span>
                 </div>
-                <input
-                  type="range"
-                  id="bass-slider"
-                  min="0"
-                  max="15"
-                  value="0"
-                  step="1"
-                  class="bass-slider"
-                  aria-label="Bass boost intensity"
-                />
+                <input type="range" id="bass-slider" min="0" max="15" value="0" step="1" class="bass-slider"
+                  aria-label="Bass boost intensity" />
               </div>
             </div>
 
             <!-- ── Action Buttons Row ── -->
             <div class="actions-row">
               <button id="btn-boost" class="btn-boost state-active">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                  <line x1="15" y1="9" x2="15" y2="15"/>
-                  <line x1="19" y1="7" x2="19" y2="17"/>
-                  <line x1="23" y1="5" x2="23" y2="19"/>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="15" y1="9" x2="15" y2="15" />
+                  <line x1="19" y1="7" x2="19" y2="17" />
+                  <line x1="23" y1="5" x2="23" y2="19" />
                 </svg>
                 <span id="boost-btn-text">Boost Active</span>
               </button>
 
               <button id="btn-mute" title="Mute/Unmute" class="btn-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                  <line x1="23" y1="9" x2="17" y2="15"/>
-                  <line x1="17" y1="9" x2="23" y2="15"/>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
               </button>
 
               <button id="btn-reset" title="Reset to 100%" class="btn-action btn-reset-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 4 1 10 7 10"/>
-                  <path d="M3.51 15a9 9 0 1 0 .49-3.67"/>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.67" />
                 </svg>
               </button>
             </div>
@@ -372,24 +422,77 @@
               <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
             </div>
 
-            <!-- ── Collapsible Advanced FX Drawer ── -->
+            <!-- ── Collapsible Advanced Studio & Settings Drawer (Absolute Overlay) ─ -->
             <div id="settings-panel" class="settings-drawer hidden">
               <div class="drawer-header">
-                <span class="drawer-title">Audio Settings & Balance</span>
+                <span class="drawer-title">Smart Audio Studio</span>
                 <button id="btn-close-settings" class="btn-icon" title="Close" aria-label="Close Settings">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
                 </button>
               </div>
+
               <div class="drawer-body">
-                <div class="section-header">
-                  <span class="section-title">Stereo Balance (L / R)</span>
-                  <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+                <!-- 1. Auto Volume Normalizer -->
+                <div class="setting-item">
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">🌙 Auto Normalizer</span>
+                      <span class="setting-sub">Evens out loud spikes & quiet dialogue</span>
+                    </div>
+                    <button id="btn-drawer-normalizer" class="switch-toggle" aria-label="Toggle Normalizer">
+                      <span class="switch-thumb"></span>
+                    </button>
+                  </div>
                 </div>
-                <div class="pan-control-row">
-                  <span class="pan-label">L</span>
-                  <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
-                  <span class="pan-label">R</span>
+
+                <!-- 2. Dialogue Clarity -->
+                <div class="setting-item">
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">🗣️ Dialogue Clarity</span>
+                      <span class="setting-sub">Boosts vocal presence for movies & podcasts</span>
+                    </div>
+                    <button id="btn-drawer-dialogue" class="switch-toggle" aria-label="Toggle Dialogue Clarity">
+                      <span class="switch-thumb"></span>
+                    </button>
+                  </div>
                 </div>
+
+                <!-- 3. Audio Sleep Timer -->
+                <div class="setting-item">
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">⏰ Audio Sleep Timer</span>
+                      <span id="drawer-timer-sub" class="setting-sub">Auto fade-out & stop</span>
+                    </div>
+                    <span id="drawer-timer-status" class="timer-badge-pill">Off</span>
+                  </div>
+                  <div class="timer-presets-row">
+                    <button class="timer-preset-btn active" data-minutes="0">Off</button>
+                    <button class="timer-preset-btn" data-minutes="15">15m</button>
+                    <button class="timer-preset-btn" data-minutes="30">30m</button>
+                    <button class="timer-preset-btn" data-minutes="45">45m</button>
+                    <button class="timer-preset-btn" data-minutes="60">60m</button>
+                  </div>
+                </div>
+
+                <!-- 4. Stereo Balance -->
+                <div class="setting-item">
+                  <div class="section-header">
+                    <span class="section-title">Stereo Balance (L / R)</span>
+                    <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+                  </div>
+                  <div class="pan-control-row">
+                    <span class="pan-label">L</span>
+                    <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" aria-label="Stereo balance" />
+                    <span class="pan-label">R</span>
+                  </div>
+                </div>
+
                 <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
               </div>
             </div>
@@ -402,26 +505,31 @@
       <section class="lg:col-span-7 space-y-5 w-full">
 
         <!-- Live Web Audio Visualizer Card -->
-        <div class="preview-panel bg-panel border border-border rounded-2xl p-4 sm:p-5 glow-canvas relative overflow-hidden">
+        <div
+          class="preview-panel bg-panel border border-border rounded-2xl p-4 sm:p-5 glow-canvas relative overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div>
               <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 text-preview-white">
                 <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
                 <span>Real-time Web Audio Spectrum</span>
               </h2>
-              <p class="text-[11px] sm:text-xs text-slate-400 text-preview-muted">Live frequency buffer • 128-bin FFT with dynamic gain scaling</p>
+              <p class="text-[11px] sm:text-xs text-slate-400 text-preview-muted">Live frequency buffer • 128-bin FFT
+                with dynamic gain scaling</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] sm:text-[11px] text-cyan-300 bg-cyan-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border border-cyan-800/60 font-semibold font-mono">
+              <span
+                class="text-[10px] sm:text-[11px] text-cyan-300 bg-cyan-950/40 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border border-cyan-800/60 font-semibold font-mono">
                 FFT: 128 Bins
               </span>
             </div>
           </div>
 
           <!-- Canvas Visualizer (Dynamic Responsive Canvas) -->
-          <div class="w-full h-32 sm:h-36 bg-[#0c0c16] rounded-xl border border-border overflow-hidden relative flex items-center justify-center">
+          <div
+            class="w-full h-32 sm:h-36 bg-[#0c0c16] rounded-xl border border-border overflow-hidden relative flex items-center justify-center">
             <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
-            <div id="canvas-overlay-text" class="absolute pointer-events-none text-[11px] sm:text-xs text-slate-200 font-medium bg-black/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg border border-border/70 shadow-lg text-center mx-2">
+            <div id="canvas-overlay-text"
+              class="absolute pointer-events-none text-[11px] sm:text-xs text-slate-200 font-medium bg-black/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg border border-border/70 shadow-lg text-center mx-2">
               ▶ Press "Play Test Sound" below to test boost & audio visualizer
             </div>
           </div>
@@ -429,12 +537,18 @@
           <!-- Audio Demo Controls -->
           <div class="mt-3.5 flex flex-wrap items-center gap-2.5 sm:gap-3 justify-between">
             <div class="flex flex-wrap items-center gap-2">
-              <button id="btn-play-demo" class="px-3.5 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-accent/20">
-                <svg id="play-icon" width="13" height="13" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"></path></svg>
+              <button id="btn-play-demo"
+                class="px-3.5 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-accent/20">
+                <svg id="play-icon" width="13" height="13" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z">
+                  </path>
+                </svg>
                 <span id="play-btn-label">Play Test Sound</span>
               </button>
 
-              <select id="sound-type" class="bg-[#1b1b30] border border-border text-slate-200 text-xs rounded-xl px-2.5 py-2 outline-none cursor-pointer">
+              <select id="sound-type"
+                class="bg-[#1b1b30] border border-border text-slate-200 text-xs rounded-xl px-2.5 py-2 outline-none cursor-pointer">
                 <option value="groove">Lofi Synth Melody</option>
                 <option value="chords">Ambient Pad Chords</option>
                 <option value="sine">Pure Test Tone (440Hz)</option>
@@ -444,7 +558,8 @@
             <!-- Safety Limiter Badge -->
             <div class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-1.5 text-preview-muted">
               <span>Limiter:</span>
-              <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold text-[10.5px]">
+              <span
+                class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold text-[10.5px]">
                 Protected (Soft-Knee)
               </span>
             </div>
@@ -454,11 +569,13 @@
         <!-- Live Audio Engine Telemetry Card -->
         <div class="preview-panel bg-panel border border-border rounded-2xl p-4 sm:p-5 space-y-3.5">
           <div class="flex items-center justify-between border-b border-border/70 pb-2.5">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 text-preview-white">
+            <h3
+              class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 text-preview-white">
               <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
               <span>Audio Engine Telemetry</span>
             </h3>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold">
+            <span
+              class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold">
               Web Audio API
             </span>
           </div>
@@ -473,7 +590,8 @@
               <div id="stat-mult" class="text-xs sm:text-sm font-bold text-cyan-300 mt-0.5">1.00×</div>
             </div>
             <div class="preview-panel-sub bg-dark/70 p-2 sm:p-2.5 rounded-xl border border-border/70">
-              <div class="text-[9.5px] sm:text-[10px] text-slate-400 font-medium text-preview-muted">Pipeline Latency</div>
+              <div class="text-[9.5px] sm:text-[10px] text-slate-400 font-medium text-preview-muted">Pipeline Latency
+              </div>
               <div class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 text-preview-white">&lt; 3.5 ms</div>
             </div>
           </div>
@@ -485,7 +603,8 @@
               <span id="meter-level-text" class="text-slate-300 font-mono text-preview-white">1.00× (100%)</span>
             </div>
             <div class="w-full h-2 bg-[#37375A] rounded-full overflow-hidden">
-              <div id="gain-meter-bar" class="h-full bg-cyan-400 transition-all duration-150" style="width: 16.6%;"></div>
+              <div id="gain-meter-bar" class="h-full bg-cyan-400 transition-all duration-150" style="width: 16.6%;">
+              </div>
             </div>
           </div>
         </div>
@@ -497,15 +616,21 @@
           </h3>
           <ol class="space-y-2 text-xs text-slate-300 leading-relaxed text-preview-muted">
             <li class="flex items-start gap-2">
-              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-              <span>Open <code class="text-cyan-400 bg-dark/60 px-1.5 py-0.5 rounded border border-border font-mono">chrome://extensions/</code> in your browser and enable <strong>Developer mode</strong>.</span>
+              <span
+                class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+              <span>Open <code
+                  class="text-cyan-400 bg-dark/60 px-1.5 py-0.5 rounded border border-border font-mono">chrome://extensions/</code>
+                in your browser and enable <strong>Developer mode</strong>.</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-              <span>Click <strong>Load unpacked</strong> and select the project directory: <code class="text-indigo-300 font-mono text-[11px] block mt-0.5">.../Volume Booster Pro</code></span>
+              <span
+                class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+              <span>Click <strong>Load unpacked</strong> and select the project directory: <code
+                  class="text-indigo-300 font-mono text-[11px] block mt-0.5">.../Volume Booster Pro</code></span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+              <span
+                class="w-5 h-5 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
               <span>Click the extension icon on any media tab to boost sound up to 600%!</span>
             </li>
           </ol>
@@ -534,15 +659,18 @@
       bass: 0,             // 0 to 15 dB
       eqMode: 'balanced',  // 'balanced' | 'bass' | 'vocal' | 'cinema'
       eqEnabled: false,    // boolean: EQ bypassed by default
+      normalizer: false,   // boolean: Auto Volume Normalizer
+      dialogueClarity: false, // boolean: Dialogue Clarity / Voice Mode
+      sleepTimer: null,    // { active: false, remainingSec: 0, totalMinutes: 0 }
       pan: 0,              // -1 to +1
       theme: 'dark'
     };
 
     const EQ_PRESETS = {
-      balanced: { bassAdd: 0,    midGain: 0,    highGain: 0,   label: 'Balanced',   color: '#38BDF8' },
-      bass:     { bassAdd: 4.5,  midGain: -1.0, highGain: 1.0, label: 'Bass Boost', color: '#8B5CF6' },
-      vocal:    { bassAdd: -1.5, midGain: 2.5,  highGain: 1.5, label: 'Vocal Clear', color: '#10B981' },
-      cinema:   { bassAdd: 3.0,  midGain: -1.0, highGain: 2.5, label: 'Cinema 3D',  color: '#EC4899' }
+      balanced: { bassAdd: 0, midGain: 0, highGain: 0, label: 'Balanced', color: '#38BDF8' },
+      bass: { bassAdd: 4.5, midGain: -1.0, highGain: 1.0, label: 'Bass Boost', color: '#8B5CF6' },
+      vocal: { bassAdd: -1.5, midGain: 2.5, highGain: 1.5, label: 'Vocal Clear', color: '#10B981' },
+      cinema: { bassAdd: 3.0, midGain: -1.0, highGain: 2.5, label: 'Cinema 3D', color: '#EC4899' }
     };
 
     // ── DOM References ──
@@ -570,9 +698,20 @@
     const btnTheme = document.getElementById('btn-theme');
     const themeIconSun = document.getElementById('theme-icon-sun');
     const themeIconMoon = document.getElementById('theme-icon-moon');
+    const btnQuickTimer = document.getElementById('btn-quick-timer');
+    const topTimerIcon = document.getElementById('top-timer-icon');
     const btnSettings = document.getElementById('btn-settings');
     const btnCloseSettings = document.getElementById('btn-close-settings');
     const settingsPanel = document.getElementById('settings-panel');
+    const btnChipNormalizer = document.getElementById('btn-chip-normalizer');
+    const btnChipDialogue = document.getElementById('btn-chip-dialogue');
+    const btnChipTimer = document.getElementById('btn-chip-timer');
+    const chipTimerText = document.getElementById('chip-timer-text');
+    const btnDrawerNormalizer = document.getElementById('btn-drawer-normalizer');
+    const btnDrawerDialogue = document.getElementById('btn-drawer-dialogue');
+    const drawerTimerStatus = document.getElementById('drawer-timer-status');
+    const drawerTimerSub = document.getElementById('drawer-timer-sub');
+    const timerPresetBtns = document.querySelectorAll('.timer-preset-btn');
     const btnPlayDemo = document.getElementById('btn-play-demo');
     const playBtnLabel = document.getElementById('play-btn-label');
     const soundTypeSelect = document.getElementById('sound-type');
@@ -593,6 +732,12 @@
     let audioCtx = null;
     let masterGain = null;
     let rawSignalBus = null;
+    let bassFilter = null;
+    let eqMidFilter = null;
+    let eqHighFilter = null;
+    let dialogueFilter = null;
+    let normalizerNode = null;
+    let panNode = null;
     let analyser = null;
     let isPlaying = false;
     let sequencerTimer = null;
@@ -645,10 +790,10 @@
         if (volumeHint) volumeHint.classList.add('hidden');
 
         let tier = 'tier-normal';
-        if (effectivePct >= 500)      tier = 'tier-max';
+        if (effectivePct >= 500) tier = 'tier-max';
         else if (effectivePct >= 400) tier = 'tier-warning';
-        else if (effectivePct > 200)  tier = 'tier-high';
-        else if (effectivePct > 100)  tier = 'tier-boosted';
+        else if (effectivePct > 200) tier = 'tier-high';
+        else if (effectivePct > 100) tier = 'tier-boosted';
         display.className = `volume-number ${tier}`;
       }
 
@@ -779,13 +924,160 @@
         }
       }
 
-      // 12. Update Web Audio Master Gain
-      if (masterGain && audioCtx) {
-        const now = audioCtx.currentTime;
-        masterGain.gain.cancelScheduledValues(now);
-        masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-        masterGain.gain.linearRampToValueAtTime(effectiveGain * 0.12, now + 0.05);
+      // 12. Smart Tools: Auto Normalizer
+      if (btnChipNormalizer) {
+        btnChipNormalizer.classList.toggle('active-cyan', !!state.normalizer);
       }
+      if (btnDrawerNormalizer) {
+        btnDrawerNormalizer.classList.toggle('active', !!state.normalizer);
+      }
+
+      // 13. Smart Tools: Dialogue Clarity
+      if (btnChipDialogue) {
+        btnChipDialogue.classList.toggle('active-purple', !!state.dialogueClarity);
+      }
+      if (btnDrawerDialogue) {
+        btnDrawerDialogue.classList.toggle('active', !!state.dialogueClarity);
+      }
+
+      // 14. Smart Tools: Sleep Timer
+      const isTimerActive = !!(state.sleepTimer?.active && state.sleepTimer?.remainingSec > 0);
+      if (isTimerActive) {
+        const timeFormatted = formatTimer(state.sleepTimer.remainingSec);
+        if (chipTimerText) chipTimerText.textContent = `⏳ ${timeFormatted}`;
+        if (btnChipTimer) btnChipTimer.classList.add('active-emerald');
+        if (drawerTimerStatus) {
+          drawerTimerStatus.textContent = `⏳ ${timeFormatted}`;
+          drawerTimerStatus.classList.add('active');
+        }
+        if (drawerTimerSub) drawerTimerSub.textContent = 'Smooth fade-out in final 60s';
+        if (topTimerIcon) topTimerIcon.textContent = '⏳';
+
+        timerPresetBtns.forEach(btn => {
+          const min = parseInt(btn.dataset.minutes, 10);
+          btn.classList.toggle('active', min === state.sleepTimer.totalMinutes);
+        });
+      } else {
+        if (chipTimerText) chipTimerText.textContent = 'Timer: Off';
+        if (btnChipTimer) btnChipTimer.classList.remove('active-emerald');
+        if (drawerTimerStatus) {
+          drawerTimerStatus.textContent = 'Off';
+          drawerTimerStatus.classList.remove('active');
+        }
+        if (drawerTimerSub) drawerTimerSub.textContent = 'Auto fade-out & stop';
+        if (topTimerIcon) topTimerIcon.textContent = '⏰';
+
+        timerPresetBtns.forEach(btn => {
+          const min = parseInt(btn.dataset.minutes, 10);
+          btn.classList.toggle('active', min === 0);
+        });
+      }
+
+      // 15. Update Web Audio DSP & Master Gain
+      if (audioCtx) {
+        const now = audioCtx.currentTime;
+        if (masterGain) {
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+          masterGain.gain.linearRampToValueAtTime(effectiveGain * 0.12, now + 0.05);
+        }
+        if (bassFilter) {
+          const preset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
+          const targetBass = state.eqEnabled ? Math.min(14, Math.max(0, state.bass + preset.bassAdd)) : 0;
+          bassFilter.gain.setTargetAtTime(targetBass, now, 0.015);
+        }
+        if (eqMidFilter) {
+          const preset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
+          const targetMid = state.eqEnabled ? preset.midGain : 0;
+          eqMidFilter.gain.setTargetAtTime(targetMid, now, 0.015);
+        }
+        if (eqHighFilter) {
+          const preset = EQ_PRESETS[state.eqMode] || EQ_PRESETS.balanced;
+          const targetHigh = state.eqEnabled ? preset.highGain : 0;
+          eqHighFilter.gain.setTargetAtTime(targetHigh, now, 0.015);
+        }
+        if (dialogueFilter) {
+          dialogueFilter.gain.setTargetAtTime(state.dialogueClarity ? 6.5 : 0, now, 0.015);
+        }
+        if (normalizerNode) {
+          if (state.normalizer) {
+            normalizerNode.threshold.setTargetAtTime(-24.0, now, 0.02);
+            normalizerNode.knee.setTargetAtTime(30.0, now, 0.02);
+            normalizerNode.ratio.setTargetAtTime(12.0, now, 0.02);
+          } else {
+            normalizerNode.threshold.setTargetAtTime(0, now, 0.02);
+            normalizerNode.knee.setTargetAtTime(0, now, 0.02);
+            normalizerNode.ratio.setTargetAtTime(1.0, now, 0.02);
+          }
+        }
+        if (panNode) {
+          panNode.pan.setTargetAtTime(state.pan, now, 0.015);
+        }
+      }
+    }
+
+    // ── Sleep Timer & Smart Tools Helpers ──
+    let timerTickerInterval = null;
+
+    function formatTimer(totalSec) {
+      if (totalSec <= 0) return '0:00';
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      if (m >= 60) {
+        const h = Math.floor(m / 60);
+        const remM = m % 60;
+        return `${h}h ${remM}m`;
+      }
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function startTimerTicker() {
+      if (timerTickerInterval) clearInterval(timerTickerInterval);
+      timerTickerInterval = setInterval(() => {
+        if (state.sleepTimer && state.sleepTimer.active && state.sleepTimer.remainingSec > 0) {
+          state.sleepTimer.remainingSec--;
+          if (state.sleepTimer.remainingSec <= 0) {
+            state.sleepTimer.active = false;
+            state.isCapturing = false;
+            clearInterval(timerTickerInterval);
+            timerTickerInterval = null;
+          }
+          syncUI();
+        } else {
+          if (timerTickerInterval) {
+            clearInterval(timerTickerInterval);
+            timerTickerInterval = null;
+          }
+        }
+      }, 1000);
+    }
+
+    function toggleNormalizer() {
+      state.normalizer = !state.normalizer;
+      syncUI();
+    }
+
+    function toggleDialogueClarity() {
+      state.dialogueClarity = !state.dialogueClarity;
+      syncUI();
+    }
+
+    function setSleepTimer(minutes) {
+      if (minutes > 0) {
+        state.sleepTimer = {
+          active: true,
+          remainingSec: minutes * 60,
+          totalMinutes: minutes
+        };
+        startTimerTicker();
+      } else {
+        state.sleepTimer = { active: false, remainingSec: 0, totalMinutes: 0 };
+        if (timerTickerInterval) {
+          clearInterval(timerTickerInterval);
+          timerTickerInterval = null;
+        }
+      }
+      syncUI();
     }
 
     // ── Web Audio Initialization ──
@@ -793,16 +1085,74 @@
       if (audioCtx) return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 128;
-
       rawSignalBus = audioCtx.createGain();
       rawSignalBus.gain.value = 1.0;
-      rawSignalBus.connect(analyser);
+
+      bassFilter = audioCtx.createBiquadFilter();
+      bassFilter.type = 'lowshelf';
+      bassFilter.frequency.setValueAtTime(80, audioCtx.currentTime);
+
+      eqMidFilter = audioCtx.createBiquadFilter();
+      eqMidFilter.type = 'peaking';
+      eqMidFilter.frequency.setValueAtTime(1800, audioCtx.currentTime);
+      eqMidFilter.Q.setValueAtTime(0.7, audioCtx.currentTime);
+
+      eqHighFilter = audioCtx.createBiquadFilter();
+      eqHighFilter.type = 'highshelf';
+      eqHighFilter.frequency.setValueAtTime(10000, audioCtx.currentTime);
+
+      dialogueFilter = audioCtx.createBiquadFilter();
+      dialogueFilter.type = 'peaking';
+      dialogueFilter.frequency.setValueAtTime(2200, audioCtx.currentTime);
+      dialogueFilter.Q.setValueAtTime(0.85, audioCtx.currentTime);
+      dialogueFilter.gain.setValueAtTime(state.dialogueClarity ? 6.5 : 0, audioCtx.currentTime);
+
+      normalizerNode = audioCtx.createDynamicsCompressor();
+      if (state.normalizer) {
+        normalizerNode.threshold.setValueAtTime(-24.0, audioCtx.currentTime);
+        normalizerNode.knee.setValueAtTime(30.0, audioCtx.currentTime);
+        normalizerNode.ratio.setValueAtTime(12.0, audioCtx.currentTime);
+        normalizerNode.attack.setValueAtTime(0.003, audioCtx.currentTime);
+        normalizerNode.release.setValueAtTime(0.25, audioCtx.currentTime);
+      } else {
+        normalizerNode.threshold.setValueAtTime(0, audioCtx.currentTime);
+        normalizerNode.knee.setValueAtTime(0, audioCtx.currentTime);
+        normalizerNode.ratio.setValueAtTime(1.0, audioCtx.currentTime);
+        normalizerNode.attack.setValueAtTime(0.003, audioCtx.currentTime);
+        normalizerNode.release.setValueAtTime(0.25, audioCtx.currentTime);
+      }
+
+      if (audioCtx.createStereoPanner) {
+        panNode = audioCtx.createStereoPanner();
+        panNode.pan.setValueAtTime(state.pan, audioCtx.currentTime);
+      }
 
       masterGain = audioCtx.createGain();
       masterGain.gain.value = (state.isMuted ? 0 : state.gain) * 0.12;
-      masterGain.connect(audioCtx.destination);
+
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+
+      // Connect DSP chain:
+      // rawSignalBus -> bassFilter -> eqMidFilter -> eqHighFilter -> dialogueFilter -> normalizerNode -> panNode -> masterGain -> analyser -> audioCtx.destination
+      let lastNode = rawSignalBus;
+      lastNode.connect(bassFilter);
+      lastNode = bassFilter;
+      lastNode.connect(eqMidFilter);
+      lastNode = eqMidFilter;
+      lastNode.connect(eqHighFilter);
+      lastNode = eqHighFilter;
+      lastNode.connect(dialogueFilter);
+      lastNode = dialogueFilter;
+      lastNode.connect(normalizerNode);
+      lastNode = normalizerNode;
+      if (panNode) {
+        lastNode.connect(panNode);
+        lastNode = panNode;
+      }
+      lastNode.connect(masterGain);
+      masterGain.connect(analyser);
+      analyser.connect(audioCtx.destination);
 
       setupCanvases();
       drawVisualizers();
@@ -907,7 +1257,6 @@
         env.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
 
         osc.connect(env);
-        env.connect(masterGain);
         env.connect(rawSignalBus);
 
         osc.start(now);
@@ -926,7 +1275,6 @@
           env.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
 
           osc.connect(env);
-          env.connect(masterGain);
           env.connect(rawSignalBus);
 
           osc.start(now);
@@ -942,7 +1290,6 @@
         env.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
         osc.connect(env);
-        env.connect(masterGain);
         env.connect(rawSignalBus);
 
         osc.start(now);
@@ -1024,8 +1371,45 @@
       state.bass = 0;
       state.eqMode = 'balanced';
       state.eqEnabled = false;
+      state.normalizer = false;
+      state.dialogueClarity = false;
+      state.sleepTimer = null;
       state.pan = 0;
+      if (timerTickerInterval) {
+        clearInterval(timerTickerInterval);
+        timerTickerInterval = null;
+      }
       syncUI();
+    });
+
+    // Smart Tools Event Listeners
+    if (btnChipNormalizer) btnChipNormalizer.addEventListener('click', toggleNormalizer);
+    if (btnDrawerNormalizer) btnDrawerNormalizer.addEventListener('click', toggleNormalizer);
+
+    if (btnChipDialogue) btnChipDialogue.addEventListener('click', toggleDialogueClarity);
+    if (btnDrawerDialogue) btnDrawerDialogue.addEventListener('click', toggleDialogueClarity);
+
+    if (btnChipTimer) {
+      btnChipTimer.addEventListener('click', () => {
+        const steps = [0, 15, 30, 45, 60];
+        const cur = state.sleepTimer?.active ? (state.sleepTimer.totalMinutes || 0) : 0;
+        const nextIdx = (steps.indexOf(cur) + 1) % steps.length;
+        setSleepTimer(steps[nextIdx]);
+      });
+    }
+
+    if (btnQuickTimer && settingsPanel) {
+      btnQuickTimer.addEventListener('click', () => {
+        settingsPanel.classList.remove('hidden');
+        if (btnSettings) btnSettings.classList.add('active');
+      });
+    }
+
+    timerPresetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const minutes = parseInt(btn.dataset.minutes, 10);
+        setSleepTimer(minutes);
+      });
     });
 
     // Theme Toggle Functionality
@@ -1107,4 +1491,5 @@
     syncUI();
   </script>
 </body>
+
 </html>

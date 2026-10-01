@@ -21,41 +21,52 @@ const DEFAULT_GAIN = 1.0;  // 100%
 const isExtensionContext = typeof chrome !== 'undefined' && !!chrome?.tabs?.query && !!chrome?.runtime?.id;
 
 // ─── DOM References ────────────────────────────────────────────────────────
-const volumeSlider       = document.getElementById('volume-slider');
-const volumeDisplay      = document.getElementById('volume-display');
-const gainSubtext        = document.getElementById('gain-subtext');
-const volumeHint         = document.getElementById('volume-hint');
-const glowOrb            = document.getElementById('glow-orb');
-const domainText         = document.getElementById('domain-text');
-const faviconImg         = document.getElementById('favicon-img');
-const faviconFallback    = document.getElementById('favicon-fallback');
-const captureStatus      = document.getElementById('capture-status');
-const boostIndicator     = document.getElementById('boost-indicator');
-const boostLabel         = document.getElementById('boost-label');
-const errorBanner        = document.getElementById('error-banner');
-const errorText          = document.getElementById('error-text');
-const btnBoost           = document.getElementById('btn-boost');
-const btnBoostText       = document.getElementById('boost-btn-text');
-const btnMute            = document.getElementById('btn-mute');
-const btnReset           = document.getElementById('btn-reset');
-const btnTheme           = document.getElementById('btn-theme');
-const themeIconSun       = document.getElementById('theme-icon-sun');
-const themeIconMoon      = document.getElementById('theme-icon-moon');
-const btnSettings        = document.getElementById('btn-settings');
-const btnCloseSettings   = document.getElementById('btn-close-settings');
-const settingsPanel      = document.getElementById('settings-panel');
-const presetBtns         = document.querySelectorAll('.preset-btn');
-const modeBtns           = document.querySelectorAll('.mode-btn');
-const activeProfileName  = document.getElementById('active-profile-name');
-const btnEqToggle        = document.getElementById('btn-eq-toggle');
-const eqToggleLabel      = document.getElementById('eq-toggle-label');
-const modesGrid          = document.querySelector('.modes-grid');
-const bassControlWrapper = document.querySelector('.bass-control-wrapper');
-const bassSlider         = document.getElementById('bass-slider');
-const bassDbText         = document.getElementById('bass-db-text');
-const panSlider          = document.getElementById('pan-slider');
-const btnResetPan        = document.getElementById('btn-reset-pan');
-const popupVisualizer    = document.getElementById('popup-visualizer');
+const volumeSlider        = document.getElementById('volume-slider');
+const volumeDisplay       = document.getElementById('volume-display');
+const gainSubtext         = document.getElementById('gain-subtext');
+const volumeHint          = document.getElementById('volume-hint');
+const glowOrb             = document.getElementById('glow-orb');
+const domainText          = document.getElementById('domain-text');
+const faviconImg          = document.getElementById('favicon-img');
+const faviconFallback     = document.getElementById('favicon-fallback');
+const captureStatus       = document.getElementById('capture-status');
+const boostIndicator      = document.getElementById('boost-indicator');
+const boostLabel          = document.getElementById('boost-label');
+const errorBanner         = document.getElementById('error-banner');
+const errorText           = document.getElementById('error-text');
+const btnBoost            = document.getElementById('btn-boost');
+const btnBoostText        = document.getElementById('boost-btn-text');
+const btnMute             = document.getElementById('btn-mute');
+const btnReset            = document.getElementById('btn-reset');
+const btnTheme            = document.getElementById('btn-theme');
+const themeIconSun        = document.getElementById('theme-icon-sun');
+const themeIconMoon       = document.getElementById('theme-icon-moon');
+const btnQuickTimer       = document.getElementById('btn-quick-timer');
+const topTimerIcon        = document.getElementById('top-timer-icon');
+const btnSettings         = document.getElementById('btn-settings');
+const btnCloseSettings    = document.getElementById('btn-close-settings');
+const settingsPanel       = document.getElementById('settings-panel');
+const btnChipNormalizer   = document.getElementById('btn-chip-normalizer');
+const btnChipDialogue     = document.getElementById('btn-chip-dialogue');
+const btnChipTimer        = document.getElementById('btn-chip-timer');
+const chipTimerText       = document.getElementById('chip-timer-text');
+const btnDrawerNormalizer = document.getElementById('btn-drawer-normalizer');
+const btnDrawerDialogue   = document.getElementById('btn-drawer-dialogue');
+const drawerTimerStatus   = document.getElementById('drawer-timer-status');
+const drawerTimerSub      = document.getElementById('drawer-timer-sub');
+const timerPresetBtns     = document.querySelectorAll('.timer-preset-btn');
+const presetBtns          = document.querySelectorAll('.preset-btn');
+const modeBtns            = document.querySelectorAll('.mode-btn');
+const activeProfileName   = document.getElementById('active-profile-name');
+const btnEqToggle         = document.getElementById('btn-eq-toggle');
+const eqToggleLabel       = document.getElementById('eq-toggle-label');
+const modesGrid           = document.querySelector('.modes-grid');
+const bassControlWrapper  = document.querySelector('.bass-control-wrapper');
+const bassSlider          = document.getElementById('bass-slider');
+const bassDbText          = document.getElementById('bass-db-text');
+const panSlider           = document.getElementById('pan-slider');
+const btnResetPan         = document.getElementById('btn-reset-pan');
+const popupVisualizer     = document.getElementById('popup-visualizer');
 
 // ─── Central State Store ───────────────────────────────────────────────────
 const state = {
@@ -67,6 +78,9 @@ const state = {
   bass: 0,                // Sub-bass boost: 0 to 15 dB
   eqMode: 'balanced',     // 'balanced' | 'bass' | 'vocal' | 'cinema'
   eqEnabled: false,       // boolean: EQ is bypassed/off by default
+  normalizer: false,      // boolean: Auto Volume Normalizer
+  dialogueClarity: false, // boolean: Dialogue Clarity / Voice Mode
+  sleepTimer: null,       // { active: false, remainingSec: 0, totalMinutes: 0 }
   pan: 0,                 // Stereo pan: -1.0 to +1.0
   theme: 'dark'           // 'dark' | 'light'
 };
@@ -279,6 +293,147 @@ function syncUI() {
       activeProfileName.classList.add('bypassed');
     }
   }
+
+  // 10. Smart Tools: Auto Normalizer
+  if (btnChipNormalizer) {
+    btnChipNormalizer.classList.toggle('active-cyan', !!state.normalizer);
+  }
+  if (btnDrawerNormalizer) {
+    btnDrawerNormalizer.classList.toggle('active', !!state.normalizer);
+  }
+
+  // 11. Smart Tools: Dialogue Clarity
+  if (btnChipDialogue) {
+    btnChipDialogue.classList.toggle('active-purple', !!state.dialogueClarity);
+  }
+  if (btnDrawerDialogue) {
+    btnDrawerDialogue.classList.toggle('active', !!state.dialogueClarity);
+  }
+
+  // 12. Smart Tools: Sleep Timer
+  const isTimerActive = !!(state.sleepTimer?.active && state.sleepTimer?.remainingSec > 0);
+  if (isTimerActive) {
+    const timeFormatted = formatTimer(state.sleepTimer.remainingSec);
+    if (chipTimerText) chipTimerText.textContent = `⏳ ${timeFormatted}`;
+    if (btnChipTimer) btnChipTimer.classList.add('active-emerald');
+    if (drawerTimerStatus) {
+      drawerTimerStatus.textContent = `⏳ ${timeFormatted}`;
+      drawerTimerStatus.classList.add('active');
+    }
+    if (drawerTimerSub) drawerTimerSub.textContent = 'Smooth fade-out in final 60s';
+    if (topTimerIcon) topTimerIcon.textContent = '⏳';
+
+    timerPresetBtns.forEach(btn => {
+      const min = parseInt(btn.dataset.minutes, 10);
+      btn.classList.toggle('active', min === state.sleepTimer.totalMinutes);
+    });
+  } else {
+    if (chipTimerText) chipTimerText.textContent = 'Timer: Off';
+    if (btnChipTimer) btnChipTimer.classList.remove('active-emerald');
+    if (drawerTimerStatus) {
+      drawerTimerStatus.textContent = 'Off';
+      drawerTimerStatus.classList.remove('active');
+    }
+    if (drawerTimerSub) drawerTimerSub.textContent = 'Auto fade-out & stop';
+    if (topTimerIcon) topTimerIcon.textContent = '⏰';
+
+    timerPresetBtns.forEach(btn => {
+      const min = parseInt(btn.dataset.minutes, 10);
+      btn.classList.toggle('active', min === 0);
+    });
+  }
+}
+
+// ─── Sleep Timer Countdown & Formatter ─────────────────────────────────────
+let timerTickerInterval = null;
+
+function formatTimer(totalSec) {
+  if (totalSec <= 0) return '0:00';
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    const remM = m % 60;
+    return `${h}h ${remM}m`;
+  }
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function startTimerTicker() {
+  if (timerTickerInterval) clearInterval(timerTickerInterval);
+  timerTickerInterval = setInterval(() => {
+    if (state.sleepTimer && state.sleepTimer.active && state.sleepTimer.remainingSec > 0) {
+      state.sleepTimer.remainingSec--;
+      if (state.sleepTimer.remainingSec <= 0) {
+        state.sleepTimer.active = false;
+        state.isCapturing = false;
+        clearInterval(timerTickerInterval);
+        timerTickerInterval = null;
+      }
+      scheduleSyncUI();
+    } else {
+      if (timerTickerInterval) {
+        clearInterval(timerTickerInterval);
+        timerTickerInterval = null;
+      }
+    }
+  }, 1000);
+}
+
+// ─── Smart Tool Mutators ───────────────────────────────────────────────────
+async function toggleNormalizer(notify = true) {
+  state.normalizer = !state.normalizer;
+  scheduleSyncUI();
+  if (notify && isExtensionContext) {
+    await sendStateToBackground('SET_NORMALIZER', { enabled: state.normalizer });
+  }
+}
+
+async function toggleDialogueClarity(notify = true) {
+  state.dialogueClarity = !state.dialogueClarity;
+  scheduleSyncUI();
+  if (notify && isExtensionContext) {
+    await sendStateToBackground('SET_DIALOGUE_CLARITY', { enabled: state.dialogueClarity });
+  }
+}
+
+async function setSleepTimer(minutes, notify = true) {
+  if (!state.isCapturing && minutes > 0) {
+    await startCapture();
+  }
+
+  if (notify && isExtensionContext) {
+    const res = await sendStateToBackground('SET_SLEEP_TIMER', { minutes });
+    if (res && res.success) {
+      state.sleepTimer = {
+        active: res.active,
+        remainingSec: res.remainingSec,
+        totalMinutes: res.totalMinutes
+      };
+    } else {
+      state.sleepTimer = { active: false, remainingSec: 0, totalMinutes: 0 };
+    }
+  } else {
+    // Standalone fallback
+    if (minutes > 0) {
+      state.sleepTimer = {
+        active: true,
+        remainingSec: minutes * 60,
+        totalMinutes: minutes
+      };
+    } else {
+      state.sleepTimer = { active: false, remainingSec: 0, totalMinutes: 0 };
+    }
+  }
+
+  if (state.sleepTimer && state.sleepTimer.active) {
+    startTimerTicker();
+  } else if (timerTickerInterval) {
+    clearInterval(timerTickerInterval);
+    timerTickerInterval = null;
+  }
+
+  scheduleSyncUI();
 }
 
 // ─── Theme Management (Light / Dark) ───────────────────────────────────────
@@ -360,7 +515,16 @@ async function resetVolume() {
   state.isMuted = false;
   state.bass = 0;
   state.eqMode = 'balanced';
+  state.eqEnabled = false;
+  state.normalizer = false;
+  state.dialogueClarity = false;
+  state.sleepTimer = null;
   state.pan = 0;
+
+  if (timerTickerInterval) {
+    clearInterval(timerTickerInterval);
+    timerTickerInterval = null;
+  }
 
   scheduleSyncUI();
   hideError();
@@ -692,6 +856,44 @@ if (btnCloseSettings && settingsPanel) {
   });
 }
 
+// 10.5 Smart Tools Event Listeners
+if (btnChipNormalizer) {
+  btnChipNormalizer.addEventListener('click', () => toggleNormalizer(true));
+}
+if (btnDrawerNormalizer) {
+  btnDrawerNormalizer.addEventListener('click', () => toggleNormalizer(true));
+}
+
+if (btnChipDialogue) {
+  btnChipDialogue.addEventListener('click', () => toggleDialogueClarity(true));
+}
+if (btnDrawerDialogue) {
+  btnDrawerDialogue.addEventListener('click', () => toggleDialogueClarity(true));
+}
+
+if (btnChipTimer) {
+  btnChipTimer.addEventListener('click', async () => {
+    const steps = [0, 15, 30, 45, 60];
+    const cur = state.sleepTimer?.active ? (state.sleepTimer.totalMinutes || 0) : 0;
+    const nextIdx = (steps.indexOf(cur) + 1) % steps.length;
+    await setSleepTimer(steps[nextIdx], true);
+  });
+}
+
+if (btnQuickTimer && settingsPanel) {
+  btnQuickTimer.addEventListener('click', () => {
+    settingsPanel.classList.remove('hidden');
+    if (btnSettings) btnSettings.classList.add('active');
+  });
+}
+
+timerPresetBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const minutes = parseInt(btn.dataset.minutes, 10);
+    setSleepTimer(minutes, true);
+  });
+});
+
 // 11. Cleanup Popup UI on Unload (Audio in Offscreen Document REMAINS ALIVE!)
 window.addEventListener('unload', () => {
   if (vizPollTimer) clearInterval(vizPollTimer);
@@ -779,6 +981,13 @@ async function init() {
       state.pan = response.state.pan ?? 0;
       state.isMuted = response.state.muted ?? false;
       state.isCapturing = response.state.capturing ?? false;
+      state.normalizer = response.state.normalizer ?? false;
+      state.dialogueClarity = response.state.dialogueClarity ?? false;
+      state.sleepTimer = response.state.sleepTimer ?? null;
+
+      if (state.sleepTimer?.active) {
+        startTimerTicker();
+      }
     }
 
     startVisualizer();

@@ -51,6 +51,11 @@
           </svg>
         </button>
 
+        <!-- Sleep Timer Quick Button -->
+        <button id="btn-quick-timer" title="Audio Sleep Timer" class="btn-icon" aria-label="Sleep Timer">
+          <span id="top-timer-icon" style="font-size: 11px;">⏰</span>
+        </button>
+
         <!-- FX & Settings Gear Toggle -->
         <button id="btn-settings" title="Audio FX Settings" class="btn-icon" aria-label="Settings">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -69,6 +74,24 @@
       </div>
       <span id="domain-text" class="domain-text">Connecting…</span>
       <span id="capture-status" class="status-badge hidden">Enabled</span>
+    </div>
+
+    <!-- ── Smart Audio Tools Bar (1-Click Enhancers) ────────────────────── -->
+    <div class="smart-tools-bar">
+      <button id="btn-chip-normalizer" class="tool-chip" title="Auto Volume Normalizer: Evens out loud spikes & quiet dialogue">
+        <span class="tool-icon">🌙</span>
+        <span class="tool-text">Normalizer</span>
+      </button>
+
+      <button id="btn-chip-dialogue" class="tool-chip" title="Dialogue Clarity: Acoustically boosts speech presence">
+        <span class="tool-icon">🗣️</span>
+        <span class="tool-text">Clear Voice</span>
+      </button>
+
+      <button id="btn-chip-timer" class="tool-chip" title="Sleep Timer: Auto fade-out & stop">
+        <span class="tool-icon">⏱️</span>
+        <span id="chip-timer-text" class="tool-text">Timer: Off</span>
+      </button>
     </div>
 
     <!-- ── Error / System Notice Banner ─────────────────────────────────── -->
@@ -233,24 +256,73 @@
       <span class="footer-ver hidden">v2.0 • Web Audio DSP</span>
     </div>
 
-    <!-- ── Collapsible Advanced FX Drawer (Absolute Overlay — Never Expands Height) ─ -->
+    <!-- ── Collapsible Advanced Studio & Settings Drawer (Absolute Overlay) ─ -->
     <div id="settings-panel" class="settings-drawer hidden">
       <div class="drawer-header">
-        <span class="drawer-title">Audio Settings & Balance</span>
+        <span class="drawer-title">Smart Audio Studio</span>
         <button id="btn-close-settings" class="btn-icon" title="Close" aria-label="Close Settings">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+
       <div class="drawer-body">
-        <div class="section-header">
-          <span class="section-title">Stereo Balance (L / R)</span>
-          <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+        <!-- 1. Auto Volume Normalizer -->
+        <div class="setting-item">
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">🌙 Auto Normalizer</span>
+              <span class="setting-sub">Evens out loud spikes & quiet dialogue</span>
+            </div>
+            <button id="btn-drawer-normalizer" class="switch-toggle" aria-label="Toggle Normalizer">
+              <span class="switch-thumb"></span>
+            </button>
+          </div>
         </div>
-        <div class="pan-control-row">
-          <span class="pan-label">L</span>
-          <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" />
-          <span class="pan-label">R</span>
+
+        <!-- 2. Dialogue Clarity -->
+        <div class="setting-item">
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">🗣️ Dialogue Clarity</span>
+              <span class="setting-sub">Boosts vocal presence for movies & podcasts</span>
+            </div>
+            <button id="btn-drawer-dialogue" class="switch-toggle" aria-label="Toggle Dialogue Clarity">
+              <span class="switch-thumb"></span>
+            </button>
+          </div>
         </div>
+
+        <!-- 3. Audio Sleep Timer -->
+        <div class="setting-item">
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">⏰ Audio Sleep Timer</span>
+              <span id="drawer-timer-sub" class="setting-sub">Auto fade-out & stop</span>
+            </div>
+            <span id="drawer-timer-status" class="timer-badge-pill">Off</span>
+          </div>
+          <div class="timer-presets-row">
+            <button class="timer-preset-btn active" data-minutes="0">Off</button>
+            <button class="timer-preset-btn" data-minutes="15">15m</button>
+            <button class="timer-preset-btn" data-minutes="30">30m</button>
+            <button class="timer-preset-btn" data-minutes="45">45m</button>
+            <button class="timer-preset-btn" data-minutes="60">60m</button>
+          </div>
+        </div>
+
+        <!-- 4. Stereo Balance -->
+        <div class="setting-item">
+          <div class="section-header">
+            <span class="section-title">Stereo Balance (L / R)</span>
+            <button id="btn-reset-pan" class="btn-pill-reset">Center</button>
+          </div>
+          <div class="pan-control-row">
+            <span class="pan-label">L</span>
+            <input type="range" id="pan-slider" min="-1" max="1" step="0.1" value="0" class="pan-slider" aria-label="Stereo balance" />
+            <span class="pan-label">R</span>
+          </div>
+        </div>
+
         <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
       </div>
     </div>

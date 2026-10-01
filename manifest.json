@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Volume Booster Pro",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Boost audio volume on any tab up to 600% using Web Audio API.",
   "author": "Volume Booster Pro",
 
@@ -9,7 +9,8 @@
     "tabCapture",
     "offscreen",
     "storage",
-    "activeTab"
+    "activeTab",
+    "alarms"
   ],
 
   "background": {

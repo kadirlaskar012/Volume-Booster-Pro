@@ -69,20 +69,22 @@ async function getTabDomain(tabId) {
 
 async function loadDomainSettings(domain) {
   if (!domain || !chrome?.storage?.local) {
-    return { gain: DEFAULT_GAIN, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0 };
+    return { gain: DEFAULT_GAIN, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0, normalizer: false, dialogueClarity: false };
   }
   const key = `vol_${domain}`;
   const res = await chrome.storage.local.get(key);
   const saved = res[key];
   if (typeof saved === 'number') {
-    return { gain: saved, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0 };
+    return { gain: saved, bass: 0, eqMode: 'balanced', eqEnabled: false, pan: 0, normalizer: false, dialogueClarity: false };
   }
   return {
     gain: saved?.gain ?? DEFAULT_GAIN,
     bass: saved?.bass ?? 0,
     eqMode: saved?.eqMode ?? 'balanced',
     eqEnabled: saved?.eqEnabled ?? false,
-    pan: saved?.pan ?? 0
+    pan: saved?.pan ?? 0,
+    normalizer: saved?.normalizer ?? false,
+    dialogueClarity: saved?.dialogueClarity ?? false
   };
 }
 
@@ -94,7 +96,9 @@ async function saveDomainSettings(domain, state) {
     bass: state.bass,
     eqMode: state.eqMode,
     eqEnabled: state.eqEnabled,
-    pan: state.pan
+    pan: state.pan,
+    normalizer: state.normalizer ?? false,
+    dialogueClarity: state.dialogueClarity ?? false
   };
   await chrome.storage.local.set({ [key]: data }).catch(() => {});
 }
@@ -108,9 +112,12 @@ async function initTabState(tabId) {
     eqMode: settings.eqMode,
     eqEnabled: settings.eqEnabled ?? false,
     pan: settings.pan,
+    normalizer: settings.normalizer ?? false,
+    dialogueClarity: settings.dialogueClarity ?? false,
     muted: false,
     domain,
-    capturing: false
+    capturing: false,
+    sleepTimer: null
   };
   tabState.set(tabId, state);
   return state;
@@ -165,7 +172,7 @@ async function handleMessage(message, sender) {
     // ── Popup queries current state ──
     case 'GET_STATE': {
       const state = await getTabState(tabId);
-      // Verify with offscreen document whether capture is truly running
+      // Verify with offscreen document whether capture is truly running and get timer status
       if (await hasOffscreenDocument()) {
         try {
           const res = await chrome.runtime.sendMessage({
@@ -176,9 +183,18 @@ async function handleMessage(message, sender) {
           if (res && typeof res.capturing === 'boolean') {
             state.capturing = res.capturing;
           }
+          const timerRes = await chrome.runtime.sendMessage({
+            target: 'offscreen',
+            type: 'GET_TIMER_STATUS',
+            tabId
+          });
+          if (timerRes) {
+            state.sleepTimer = timerRes;
+          }
         } catch {}
       } else {
         state.capturing = false;
+        state.sleepTimer = null;
       }
       return { success: true, state };
     }
@@ -202,7 +218,9 @@ async function handleMessage(message, sender) {
         eqMode: state.eqMode,
         eqEnabled: state.eqEnabled,
         pan: state.pan,
-        muted: state.muted
+        muted: state.muted,
+        normalizer: state.normalizer,
+        dialogueClarity: state.dialogueClarity
       });
 
       if (response?.error) {
@@ -312,6 +330,72 @@ async function handleMessage(message, sender) {
       return { success: true, eqEnabled: state.eqEnabled };
     }
 
+    // ── Auto Volume Normalizer Toggle ──
+    case 'SET_NORMALIZER': {
+      const state = await getTabState(tabId);
+      state.normalizer = !!message.enabled;
+      tabState.set(tabId, state);
+
+      if (state.capturing && (await hasOffscreenDocument())) {
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_NORMALIZER',
+          tabId,
+          enabled: state.normalizer
+        }).catch(() => {});
+      }
+
+      await saveDomainSettings(state.domain, state);
+      return { success: true, normalizer: state.normalizer };
+    }
+
+    // ── Dialogue Clarity / Voice Mode Toggle ──
+    case 'SET_DIALOGUE_CLARITY': {
+      const state = await getTabState(tabId);
+      state.dialogueClarity = !!message.enabled;
+      tabState.set(tabId, state);
+
+      if (state.capturing && (await hasOffscreenDocument())) {
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_DIALOGUE_CLARITY',
+          tabId,
+          enabled: state.dialogueClarity
+        }).catch(() => {});
+      }
+
+      await saveDomainSettings(state.domain, state);
+      return { success: true, dialogueClarity: state.dialogueClarity };
+    }
+
+    // ── Sleep Timer Controller ──
+    case 'SET_SLEEP_TIMER': {
+      const state = await getTabState(tabId);
+      if (state.capturing && (await hasOffscreenDocument())) {
+        const timerRes = await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_SLEEP_TIMER',
+          tabId,
+          minutes: message.minutes
+        });
+        state.sleepTimer = timerRes;
+        return { success: true, ...timerRes };
+      }
+      return { success: false, notCapturing: true };
+    }
+
+    case 'GET_TIMER_STATUS': {
+      if (await hasOffscreenDocument()) {
+        const timerRes = await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'GET_TIMER_STATUS',
+          tabId
+        }).catch(() => ({ active: false, remainingSec: 0, totalMinutes: 0 }));
+        return timerRes;
+      }
+      return { active: false, remainingSec: 0, totalMinutes: 0 };
+    }
+
     // ── Stereo Pan ──
     case 'SET_PAN': {
       const state = await getTabState(tabId);
@@ -356,6 +440,10 @@ async function handleMessage(message, sender) {
       state.gain = DEFAULT_GAIN;
       state.bass = 0;
       state.eqMode = 'balanced';
+      state.eqEnabled = false;
+      state.normalizer = false;
+      state.dialogueClarity = false;
+      state.sleepTimer = null;
       state.pan = 0;
       state.muted = false;
       tabState.set(tabId, state);
@@ -385,6 +473,30 @@ async function handleMessage(message, sender) {
         }).catch(() => {});
         await chrome.runtime.sendMessage({
           target: 'offscreen',
+          type: 'SET_EQ_ENABLED',
+          tabId,
+          enabled: false
+        }).catch(() => {});
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_NORMALIZER',
+          tabId,
+          enabled: false
+        }).catch(() => {});
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_DIALOGUE_CLARITY',
+          tabId,
+          enabled: false
+        }).catch(() => {});
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
+          type: 'SET_SLEEP_TIMER',
+          tabId,
+          minutes: 0
+        }).catch(() => {});
+        await chrome.runtime.sendMessage({
+          target: 'offscreen',
           type: 'SET_PAN',
           tabId,
           pan: 0
@@ -400,6 +512,18 @@ async function handleMessage(message, sender) {
       if (tabState.has(tabId)) {
         const state = tabState.get(tabId);
         state.capturing = false;
+        state.sleepTimer = null;
+        await updateBadge(tabId, state.gain, false, false);
+      }
+      return { success: true };
+    }
+
+    // ── Notification from Offscreen document when sleep timer finished ──
+    case 'TAB_TIMER_EXPIRED': {
+      if (tabState.has(tabId)) {
+        const state = tabState.get(tabId);
+        state.capturing = false;
+        state.sleepTimer = null;
         await updateBadge(tabId, state.gain, false, false);
       }
       return { success: true };
