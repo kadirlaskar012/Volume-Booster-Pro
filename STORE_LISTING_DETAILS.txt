@@ -1,9 +1,9 @@
 ================================================================================
           CHROME WEB STORE PUBLISHING DETAILS — VOLUME BOOSTER PRO
 ================================================================================
-Project: Volume Booster Pro (Ultra Audio Engine v2.0)
+Project: Volume Booster Pro (Smart Audio Suite v2.1.0)
 Manifest Version: MV3 (Manifest V3 - 100% Compliant)
-Date Prepared: September 2026
+Date Prepared: October 2026
 
 --------------------------------------------------------------------------------
 1. STORE LISTING — BASIC INFORMATION
@@ -16,8 +16,8 @@ SHORT TITLE (Optional, for compact UI):
 Volume Booster Pro
 
 SUMMARY / SHORT DESCRIPTION (Strict limit: 132 characters):
-Boost browser audio up to 600%, enhance deep bass, and customize sound with audio presets and a built-in safety limiter.
-[Length: 120 characters — 100% Policy Compliant, Zero Brand Keywords]
+Boost browser audio up to 600%, level night volume, clarify voices, set sleep timer, and customize sound with pro EQ and bass.
+[Length: 126 characters — 100% Policy Compliant, Zero Brand Keywords]
 
 PRIMARY CATEGORY:
 Accessibility  (Alternative: Productivity or Entertainment)
@@ -47,6 +47,19 @@ From quiet speech in web meetings and podcasts to energetic music tracks and imm
 • Amplify any media tab beyond the standard 100% volume ceiling.
 • Clean, transparent gain staging powered by Web Audio API GainNode.
 • Instant 1-click presets: 100% (1×), 150% (1.5×), 200% (2×), 300% (3×), 400% (4×), and 600% (6×).
+
+🌙 AUTO VOLUME NORMALIZER (NEW!)
+• Dynamic leveling balances deafening action spikes and whispering dialogue.
+• Enjoy movies and videos late at night without riding the volume slider.
+
+🗣️ DIALOGUE CLARITY & VOCAL ENHANCER (NEW!)
+• Acoustically targets 2.2 kHz human speech formant frequencies.
+• Makes voices crisp and intelligible in action movies, lectures, and calls.
+
+⏰ AUDIO SLEEP TIMER WITH GENTLE FADE-OUT (NEW!)
+• 15m, 30m, 45m, and 60m countdown presets.
+• Smooth exponential volume fade-out over the final 60 seconds.
+• Automatically stops tab audio and resets toolbar badge when expired.
 
 🛡️ INTELLIGENT SOFT-KNEE SAFETY LIMITER
 • Built-in dynamic compression prevents speaker distortion and clipping.
