@@ -250,13 +250,16 @@
       </button>
     </div>
 
-    <!-- ── Footer Bar (Prominent Hotkey Tip, Version Hidden in Prod) ───── -->
+    <!-- ── Footer Bar (Prominent Hotkey Tip + What's New Pill) ─────────── -->
     <div class="footer-bar">
       <div class="hotkey-tip">
         <kbd class="kbd-shortcut">Ctrl+Shift+↑↓</kbd>
-        <span class="hotkey-label">to adjust boost</span>
+        <span class="hotkey-label">boost</span>
       </div>
-      <span class="footer-ver hidden">v2.1.0 • Web Audio DSP</span>
+      <button id="btn-whats-new" class="footer-badge-pill" title="See what's new in v2.1.0" aria-label="What's New in v2.1.0">
+        <span id="whats-new-dot" class="pill-dot unread-pulse"></span>
+        <span class="pill-text">v2.1.0 • What's New ✨</span>
+      </button>
     </div>
 
     <!-- ── Collapsible Advanced Studio & Settings Drawer (Absolute Overlay) ─ -->
@@ -327,6 +330,85 @@
         </div>
 
         <p class="drawer-tip">Tip: Use shortcuts Ctrl+Shift+Up/Down to amplify tab audio without opening popup.</p>
+      </div>
+    </div>
+ 
+    <!-- ── What's New in v2.1.0 Overlay Modal ─────────────────────────────── -->
+    <div id="whats-new-modal" class="whats-new-modal hidden" aria-modal="true" role="dialog">
+      <div id="whats-new-backdrop" class="wn-backdrop"></div>
+      <div class="wn-card">
+        <div class="wn-header">
+          <div class="wn-header-left">
+            <div class="wn-badge-icon">🚀</div>
+            <div>
+              <div class="wn-title-row">
+                <span class="wn-title">What's New</span>
+                <span class="wn-version-tag">v2.1.0</span>
+              </div>
+              <span class="wn-subtitle">Major Audio Intelligence Upgrade</span>
+            </div>
+          </div>
+          <button id="btn-close-whats-new" class="btn-icon" title="Close" aria-label="Close What's New">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="wn-body">
+          <!-- Feature Item 1 -->
+          <div class="wn-item">
+            <div class="wn-icon-box wn-icon-cyan">🌙</div>
+            <div class="wn-item-content">
+              <div class="wn-item-header">
+                <span class="wn-item-title">Auto Volume Normalizer</span>
+                <span class="wn-chip-tag chip-cyan">SMART DSP</span>
+              </div>
+              <p class="wn-item-desc">Balances loud sound spikes and quiet whispers automatically for comfortable listening without sudden ear fatigue.</p>
+            </div>
+          </div>
+
+          <!-- Feature Item 2 -->
+          <div class="wn-item">
+            <div class="wn-icon-box wn-icon-purple">🗣️</div>
+            <div class="wn-item-content">
+              <div class="wn-item-header">
+                <span class="wn-item-title">Dialogue Clarity Mode</span>
+                <span class="wn-chip-tag chip-purple">VOICE BOOST</span>
+              </div>
+              <p class="wn-item-desc">Pinpoints and boosts 2.2 kHz human speech frequencies so movie dialogue, lectures, and podcasts sound crystal clear.</p>
+            </div>
+          </div>
+
+          <!-- Feature Item 3 -->
+          <div class="wn-item">
+            <div class="wn-icon-box wn-icon-green">⏰</div>
+            <div class="wn-item-content">
+              <div class="wn-item-header">
+                <span class="wn-item-title">Audio Sleep Timer</span>
+                <span class="wn-chip-tag chip-green">AUTO STOP</span>
+              </div>
+              <p class="wn-item-desc">Set 15, 30, 45, or 60 minute timers. Includes a gentle 60-second fade-out before playback stops so you sleep peacefully.</p>
+            </div>
+          </div>
+
+          <!-- Feature Item 4 -->
+          <div class="wn-item">
+            <div class="wn-icon-box wn-icon-pink">🎛️</div>
+            <div class="wn-item-content">
+              <div class="wn-item-header">
+                <span class="wn-item-title">Refined Pro Interface</span>
+                <span class="wn-chip-tag chip-pink">REDESIGNED</span>
+              </div>
+              <p class="wn-item-desc">Spacious 475px studio layout with instant 1-click toggles right on top and zero clipping across all browser displays.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="wn-footer">
+          <button id="btn-whats-new-dismiss" class="btn-wn-primary">
+            <span>Got it, Explore Now!</span>
+            <span class="btn-arrow">🚀</span>
+          </button>
+        </div>
       </div>
     </div>
 

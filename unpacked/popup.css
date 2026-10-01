@@ -795,21 +795,23 @@ body {
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
 }
 
-/* ── Footer / Shortcut Hint ──────────────────────────────────────────────── */
+/* ── Footer / Shortcut Hint & What's New Pill ────────────────────────────── */
 .footer-bar {
   height: 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .hotkey-tip {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: var(--btn-bg);
   border: 1px solid var(--border);
-  padding: 2px 8px;
+  padding: 1.5px 6px;
   border-radius: 5px;
 }
 
@@ -818,8 +820,8 @@ body {
   border: 1px solid var(--border);
   border-bottom: 2px solid var(--border-glow);
   border-radius: 3px;
-  padding: 1px 5px;
-  font-size: 9.5px;
+  padding: 1px 4px;
+  font-size: 8.5px;
   font-weight: 700;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   color: var(--accent-cyan);
@@ -827,13 +829,299 @@ body {
 }
 
 .hotkey-label {
-  font-size: 9.5px;
+  font-size: 8.5px;
   font-weight: 500;
   color: var(--text-muted);
 }
 
-.footer-ver {
-  display: none !important;
+.footer-badge-pill {
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 99px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: var(--accent-cyan);
+  font-size: 8.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.16s ease;
+  user-select: none;
+  outline: none;
+}
+
+.footer-badge-pill:hover {
+  background: rgba(6, 182, 212, 0.22);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.35);
+  color: #FFFFFF;
+}
+
+.pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.pill-dot.unread-pulse {
+  background: #EC4899;
+  box-shadow: 0 0 6px #EC4899;
+  animation: pulseDot 1.6s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* ── What's New in v2.1.0 Modal Sheet ────────────────────────────────────── */
+.whats-new-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  animation: fadeIn 0.18s ease-out;
+}
+
+.wn-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 7, 15, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.wn-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-dark);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(6, 182, 212, 0.15);
+  animation: modalScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.wn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.wn-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wn-badge-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(6, 182, 212, 0.25));
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+}
+
+.wn-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wn-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.wn-version-tag {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+.wn-subtitle {
+  font-size: 8.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: block;
+}
+
+.wn-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 310px;
+}
+
+.wn-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  transition: all 0.16s ease;
+}
+
+.wn-item:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-1px);
+}
+
+.wn-icon-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.wn-icon-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+}
+
+.wn-icon-purple {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+.wn-icon-green {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.wn-icon-pink {
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.4);
+}
+
+.wn-item-content {
+  flex: 1;
+}
+
+.wn-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.wn-item-title {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.wn-chip-tag {
+  font-size: 6.5px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.4px;
+}
+
+.chip-cyan {
+  background: rgba(6, 182, 212, 0.18);
+  color: #06B6D4;
+  border: 1px solid rgba(6, 182, 212, 0.4);
+}
+
+.chip-purple {
+  background: rgba(139, 92, 246, 0.18);
+  color: #A78BFA;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+.chip-green {
+  background: rgba(34, 197, 94, 0.18);
+  color: #4ADE80;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.chip-pink {
+  background: rgba(236, 72, 153, 0.18);
+  color: #F472B6;
+  border: 1px solid rgba(236, 72, 153, 0.4);
+}
+
+.wn-item-desc {
+  font-size: 8px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.wn-footer {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.btn-wn-primary {
+  width: 100%;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 3px 12px rgba(6, 182, 212, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.btn-wn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-wn-primary:active {
+  transform: translateY(0);
 }
 
 /* ── Collapsible Advanced FX Drawer (Absolute Overlay — Zero Height Shift) ─ */

@@ -68,6 +68,12 @@ const bassDbText          = document.getElementById('bass-db-text');
 const panSlider           = document.getElementById('pan-slider');
 const btnResetPan         = document.getElementById('btn-reset-pan');
 const popupVisualizer     = document.getElementById('popup-visualizer');
+const btnWhatsNew         = document.getElementById('btn-whats-new');
+const whatsNewDot         = document.getElementById('whats-new-dot');
+const whatsNewModal       = document.getElementById('whats-new-modal');
+const whatsNewBackdrop    = document.getElementById('whats-new-backdrop');
+const btnCloseWhatsNew    = document.getElementById('btn-close-whats-new');
+const btnWhatsNewDismiss  = document.getElementById('btn-whats-new-dismiss');
 
 // ─── Central State Store ───────────────────────────────────────────────────
 const state = {
@@ -897,6 +903,66 @@ timerPresetBtns.forEach(btn => {
   });
 });
 
+// 10.8 What's New in v2.1.0 Handlers
+function openWhatsNew() {
+  if (whatsNewModal) {
+    whatsNewModal.classList.remove('hidden');
+    dismissWhatsNewUnread();
+  }
+}
+
+function closeWhatsNew() {
+  if (whatsNewModal) {
+    whatsNewModal.classList.add('hidden');
+    dismissWhatsNewUnread();
+  }
+}
+
+function dismissWhatsNewUnread() {
+  if (whatsNewDot) {
+    whatsNewDot.classList.remove('unread-pulse');
+  }
+  if (chrome?.storage?.local) {
+    chrome.storage.local.set({ vbp_seen_ver: '2.1.0' }).catch(() => {});
+  } else {
+    try { localStorage.setItem('vbp_seen_ver', '2.1.0'); } catch {}
+  }
+}
+
+async function checkWhatsNewStatus() {
+  try {
+    let seenVer = null;
+    if (chrome?.storage?.local) {
+      const data = await chrome.storage.local.get('vbp_seen_ver').catch(() => null);
+      seenVer = data?.vbp_seen_ver;
+    } else {
+      try { seenVer = localStorage.getItem('vbp_seen_ver'); } catch {}
+    }
+
+    if (seenVer !== '2.1.0') {
+      if (whatsNewDot) whatsNewDot.classList.add('unread-pulse');
+      openWhatsNew();
+    } else {
+      if (whatsNewDot) whatsNewDot.classList.remove('unread-pulse');
+    }
+  } catch (e) {
+    console.warn('[VBP] checkWhatsNewStatus error:', e);
+  }
+}
+
+if (btnWhatsNew) {
+  btnWhatsNew.addEventListener('click', openWhatsNew);
+}
+if (btnCloseWhatsNew) {
+  btnCloseWhatsNew.addEventListener('click', closeWhatsNew);
+}
+if (btnWhatsNewDismiss) {
+  btnWhatsNewDismiss.addEventListener('click', closeWhatsNew);
+}
+if (whatsNewBackdrop) {
+  whatsNewBackdrop.addEventListener('click', closeWhatsNew);
+}
+
 // 11. Cleanup Popup UI on Unload (Audio in Offscreen Document REMAINS ALIVE!)
 window.addEventListener('unload', () => {
   if (vizPollTimer) clearInterval(vizPollTimer);
@@ -928,6 +994,7 @@ async function init() {
       if (domainText) domainText.textContent = state.domain;
       startVisualizer();
       scheduleSyncUI();
+      checkWhatsNewStatus();
       return;
     }
 
@@ -950,6 +1017,7 @@ async function init() {
       showError('System page: Audio capture is restricted. Open any website playing audio to boost.');
       disableControls();
       scheduleSyncUI();
+      checkWhatsNewStatus();
       return;
     }
 
@@ -995,6 +1063,7 @@ async function init() {
 
     startVisualizer();
     scheduleSyncUI();
+    checkWhatsNewStatus();
 
   } catch (err) {
     console.error('[VBP Popup] Init error:', err);
