@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Marquee Promo Tile (1400x560)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html, body {
+      width: 1400px;
+      height: 560px;
+      min-width: 1400px;
+      max-width: 1400px;
+      min-height: 560px;
+      max-height: 560px;
+      overflow: hidden;
+      background: #070814;
+      color: #FFFFFF;
+      position: relative;
+    }
+
+    /* Ambient Glows */
+    .glow-cyan {
+      position: absolute;
+      top: -120px;
+      left: 100px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.28) 0%, transparent 70%);
+      filter: blur(70px);
+      pointer-events: none;
+    }
+
+    .glow-purple {
+      position: absolute;
+      bottom: -150px;
+      right: 150px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    .glow-pink {
+      position: absolute;
+      top: 60px;
+      right: 480px;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, transparent 75%);
+      filter: blur(65px);
+      pointer-events: none;
+    }
+
+    /* Grid Lines */
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 35px 35px;
+      pointer-events: none;
+    }
+
+    /* Master Container */
+    .marquee-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 1400px;
+      height: 560px;
+      padding: 50px 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 50px;
+    }
+
+    /* Left Content Column */
+    .hero-content {
+      width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .top-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(6, 182, 212, 0.16);
+      border: 1px solid rgba(6, 182, 212, 0.45);
+      color: #38BDF8;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pill-dot {
+      width: 6.5px;
+      height: 6.5px;
+      border-radius: 50%;
+      background: #06B6D4;
+      box-shadow: 0 0 8px #06B6D4;
+    }
+
+    .hero-title {
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #FFFFFF 25%, #E2E8F0 60%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title span.accent-text {
+      background: linear-gradient(135deg, #38BDF8, #8B5CF6, #EC4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #94A3B8;
+      font-weight: 400;
+      max-width: 680px;
+    }
+
+    /* Feature Pills Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .feat-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 10px;
+      padding: 8px 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .feat-icon {
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .feat-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #F1F5F9;
+      white-space: nowrap;
+    }
+
+    .feat-new-tag {
+      font-size: 7.5px;
+      font-weight: 900;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #EC4899, #8B5CF6);
+      color: #FFFFFF;
+      letter-spacing: 0.3px;
+    }
+
+    /* Trust Footer */
+    .trust-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748B;
+      margin-top: 4px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Right Showcase Stage */
+    .showcase-stage {
+      position: relative;
+      width: 440px;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Browser Mockup Window */
+    .mockup-window {
+      width: 320px;
+      border-radius: 16px;
+      background: #0B0E1B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow:
+        0 25px 60px -10px rgba(0, 0, 0, 0.85),
+        0 0 40px rgba(6, 182, 212, 0.25),
+        0 0 80px rgba(139, 92, 246, 0.2);
+      overflow: hidden;
+      transform: translateY(-8px);
+    }
+
+    .mockup-header {
+      background: #080A14;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+
+    .window-url {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9.5px;
+      color: #94A3B8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-icon {
+      font-size: 9px;
+      font-weight: 800;
+      background: #06B6D4;
+      color: #000;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* Popup Inner Content Preview */
+    .popup-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Smart Chips Bar */
+    .smart-chips {
+      display: flex;
+      gap: 5px;
+    }
+
+    .chip {
+      flex: 1;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      font-size: 8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #CBD5E1;
+    }
+
+    .chip.active-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: #06B6D4;
+      color: #38BDF8;
+    }
+
+    /* Volume Display Card */
+    .vol-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .vol-status {
+      font-size: 8px;
+      font-weight: 800;
+      color: #F59E0B;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .vol-number {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #FDE047, #F59E0B, #EF4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 3px;
+    }
+
+    .vol-sub {
+      font-size: 9.5px;
+      color: #94A3B8;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    /* Fake Visualizer */
+    .bars-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 3px;
+      height: 16px;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      width: 5px;
+      border-radius: 2px;
+      background: linear-gradient(to top, #6C63FF, #06B6D4);
+    }
+
+    /* Presets Row */
+    .presets {
+      display: flex;
+      gap: 4px;
+    }
+
+    .preset-btn {
+      flex: 1;
+      height: 20px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 9px;
+      font-weight: 700;
+      color: #94A3B8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preset-btn.active {
+      background: linear-gradient(135deg, #EF4444, #F59E0B);
+      color: #FFFFFF;
+      border-color: transparent;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Floating Callout Badges */
+    .callout-pill {
+      position: absolute;
+      background: rgba(14, 18, 35, 0.94);
+      border: 1px solid #06B6D4;
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.35);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #38BDF8;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    .badge-top-left {
+      top: 15px;
+      left: -40px;
+    }
+
+    .badge-bottom-right {
+      bottom: 25px;
+      right: -30px;
+      border-color: #A78BFA;
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35);
+      color: #C4B5FD;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-cyan"></div>
+  <div class="glow-purple"></div>
+  <div class="glow-pink"></div>
+  <div class="grid-lines"></div>
+
+  <div class="marquee-wrapper">
+    <!-- Left Hero Column -->
+    <div class="hero-content">
+      <div class="top-badge-row">
+        <div class="version-pill">
+          <span class="pill-dot"></span>
+          <span>Smart Audio Suite v2.1.0</span>
+        </div>
+      </div>
+
+      <h1 class="hero-title">
+        Supercharge Tab Audio<br/>
+        <span class="accent-text">Up To 600% Overdrive</span>
+      </h1>
+
+      <p class="hero-desc">
+        Pristine Web Audio amplification with intelligent Auto Volume Normalizer, Dialogue Clarity, +15 dB Sub-Bass, and Sleep Timer.
+      </p>
+
+      <!-- 6 Key Features -->
+      <div class="features-grid">
+        <div class="feat-card">
+          <span class="feat-icon">🌙</span>
+          <span class="feat-title">Auto Normalizer</span>
+          <span class="feat-new-tag">NEW</span>
+        </div>
+        <div class="feat-card">
+          <span class="feat-icon">🗣️</span>
+          <span class="feat-title">Dialogue Clarity</span>
+          <span class="feat-new-tag">NEW</span>
+        </div>
+        <div class="feat-card">
+          <span class="feat-icon">⏰</span>
+          <span class="feat-title">Sleep Timer</span>
+          <span class="feat-new-tag">NEW</span>
+        </div>
+        <div class="feat-card">
+          <span class="feat-icon">🔊</span>
+          <span class="feat-title">+15 dB Sub-Bass</span>
+        </div>
+        <div class="feat-card">
+          <span class="feat-icon">🎧</span>
+          <span class="feat-title">4 Pro EQ Profiles</span>
+        </div>
+        <div class="feat-card">
+          <span class="feat-icon">🛡️</span>
+          <span class="feat-title">Safety Limiter</span>
+        </div>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="trust-footer">
+        <div class="trust-item">
+          <span>🔒</span>
+          <span>100% Client-Side Privacy</span>
+        </div>
+        <span>•</span>
+        <div class="trust-item">
+          <span>⚡</span>
+          <span>Zero Audio Latency</span>
+        </div>
+        <span>•</span>
+        <div class="trust-item">
+          <span>⌨️</span>
+          <span>Ctrl+Shift+↑↓ Shortcuts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Showcase Stage -->
+    <div class="showcase-stage">
+      <!-- Floating Callouts -->
+      <div class="callout-pill badge-top-left">
+        <span>⚡</span>
+        <span>600% Clean Overdrive</span>
+      </div>
+
+      <div class="callout-pill badge-bottom-right">
+        <span>🌙</span>
+        <span>Night Balance & Voice Boost</span>
+      </div>
+
+      <!-- Mockup Frame -->
+      <div class="mockup-window">
+        <div class="mockup-header">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="window-url">
+            <span style="color:#10B981;">●</span>
+            <span>youtube.com</span>
+          </div>
+          <span class="badge-icon">6×</span>
+        </div>
+
+        <div class="popup-body">
+          <!-- Smart Chips -->
+          <div class="smart-chips">
+            <div class="chip active-cyan">🌙 Normalizer</div>
+            <div class="chip">🗣️ Clear Voice</div>
+            <div class="chip">⏰ Timer: Off</div>
+          </div>
+
+          <!-- Volume Card -->
+          <div class="vol-card">
+            <div class="vol-status">HIGH BOOST ⚠️</div>
+            <div class="vol-number">600%</div>
+            <div class="vol-sub">6.00× (Maximum Overdrive)</div>
+
+            <!-- Fake Mini Visualizer -->
+            <div class="bars-row">
+              <div class="bar" style="height: 6px;"></div>
+              <div class="bar" style="height: 10px;"></div>
+              <div class="bar" style="height: 14px;"></div>
+              <div class="bar" style="height: 16px;"></div>
+              <div class="bar" style="height: 12px;"></div>
+              <div class="bar" style="height: 15px;"></div>
+              <div class="bar" style="height: 9px;"></div>
+              <div class="bar" style="height: 14px;"></div>
+              <div class="bar" style="height: 16px;"></div>
+              <div class="bar" style="height: 11px;"></div>
+              <div class="bar" style="height: 8px;"></div>
+              <div class="bar" style="height: 13px;"></div>
+            </div>
+
+            <!-- Presets Row -->
+            <div class="presets">
+              <div class="preset-btn">1×</div>
+              <div class="preset-btn">1.5×</div>
+              <div class="preset-btn">2×</div>
+              <div class="preset-btn">3×</div>
+              <div class="preset-btn">4×</div>
+              <div class="preset-btn active">6×</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
